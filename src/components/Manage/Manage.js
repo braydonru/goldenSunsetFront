@@ -6,7 +6,15 @@ import StatCard from "./StatCard";
 import { useProductCount } from "../../hooks/get_products";
 import { useOrdersCount } from "../../hooks/get_orders";
 import { useCategoryCount } from "../../hooks/get_category";
-import { FaBoxOpen, FaShoppingBag, FaPalette, FaTags } from "react-icons/fa";
+import {
+    FaBoxOpen,
+    FaShoppingBag,
+    FaPalette,
+    FaTags,
+    FaUserAlt,
+    FaDelicious,
+    FaArrowAltCircleDown, FaArchway, FaAtom
+} from "react-icons/fa";
 import { useColorCount } from "../../hooks/get_colors";
 import './Manage.css'; // Crearemos este archivo
 
@@ -59,7 +67,7 @@ const Manage = () => {
             title: "Variants",
             count: '',
             loading: loadingCategory,
-            icon: <FaTags />,
+            icon: <FaAtom/>,
             url: "listvariants",
             color: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
         },
@@ -68,8 +76,17 @@ const Manage = () => {
             title: "Designs",
             count: '',//Poner aqui el contador de disennos
             loading: '',//Poner aqui el loading de disennos
-            icon: <FaTags />,
+            icon: <FaDelicious/>,
             url: "/Manage/listdesigns",//Poner aqui el url de disennos
+            color: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+        },
+        {
+            id: 7,
+            title: "Human resources",
+            count: '',//Poner aqui el contador de disennos
+            loading: '',//Poner aqui el loading de disennos
+            icon: <FaUserAlt/>,
+            url: "/Manage/listusers",//Poner aqui el url de disennos
             color: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
         }
     ];

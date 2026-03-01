@@ -26,6 +26,7 @@ import AllReviews from "./components/Home/AllReviews";
 import Reviews from "./components/Home/Reviews";
 import Designs from "./components/Home/Designs";
 import ListDesigns from "./components/Manage/ListDesign";
+import ListUsers from "./components/Manage/ListUsers";
 
 const App = () => {
     return (
@@ -149,6 +150,14 @@ const App = () => {
                 element={
                     <AdminRoute>
                         <ListDesigns />
+                    </AdminRoute>
+                }
+            />
+            <Route
+                path="/Manage/listusers"
+                element={
+                    <AdminRoute>
+                        <ListUsers/>
                     </AdminRoute>
                 }
             />
