@@ -1,0 +1,90 @@
+.designer-wrapper {
+    display: flex;
+    gap: 24px;
+    background: #0f172a;
+    padding: 24px;
+    border-radius: 16px;
+    color: #e5e7eb;
+    font-family: system-ui, sans-serif;
+}
+
+.designer-sidebar {
+    width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.designer-sidebar button {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #1e293b;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.designer-sidebar button.active {
+    background: #3b82f6;
+}
+
+.designer-sidebar button:hover {
+    background: #334155;
+}
+
+.designer-canvas {
+    background: #020617;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}
+
+.designer-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.designer-controls input[type="text"] {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: #020617;
+    color: white;
+    outline: none;
+}
+
+.designer-controls input[type="color"] {
+    height: 42px;
+    border-radius: 10px;
+    border: none;
+    padding: 4px;
+}
+
+.upload-btn,
+.export-btn {
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    background: #22c55e;
+    color: #022c22;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.export-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.upload-btn:hover,
+.export-btn:hover {
+    opacity: 0.9;
+}
+
+canvas {
+    border-radius: 12px;
+    background: #020617;
+}

@@ -1,0 +1,188 @@
+/* ForPullover.css */
+
+.designer-container {
+    max-width: 1800px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Header del diseñador */
+.designer-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.designer-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.designer-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+}
+
+/* Grid principal - 3 columnas en desktop */
+.designer-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Estilos comunes para todas las columnas */
+.designer-sidebar,
+.designer-main,
+.designer-variants {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.designer-sidebar:hover,
+.designer-main:hover,
+.designer-variants:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Área principal ocupa más espacio */
+.designer-main {
+    background: #f8f9fa;
+}
+
+/* ===== MEDIA QUERIES - RESPONSIVE ===== */
+
+/* Pantallas grandes (1200px - 1600px) */
+@media (max-width: 1600px) {
+    .designer-grid {
+        grid-template-columns: 260px 1fr 260px;
+        gap: 1.2rem;
+    }
+}
+
+/* Tablets horizontales / laptops pequeñas (992px - 1200px) */
+@media (max-width: 1200px) {
+    .designer-grid {
+        grid-template-columns: 240px 1fr 240px;
+        gap: 1rem;
+    }
+
+    .designer-title {
+        font-size: 2.2rem;
+    }
+}
+
+/* Tablets verticales (768px - 992px) */
+@media (max-width: 992px) {
+    .designer-grid {
+        grid-template-columns: 1fr; /* Una sola columna */
+        gap: 1.5rem;
+    }
+
+    .designer-sidebar,
+    .designer-main,
+    .designer-variants {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .designer-header {
+        padding: 1.2rem;
+    }
+
+    .designer-title {
+        font-size: 2rem;
+    }
+
+    .designer-subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Móviles grandes (576px - 768px) */
+@media (max-width: 768px) {
+    .designer-container {
+        padding: 0 1rem;
+    }
+
+    .designer-header {
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .designer-title {
+        font-size: 1.8rem;
+    }
+
+    .designer-grid {
+        gap: 1.2rem;
+    }
+}
+
+/* Móviles pequeños (menos de 576px) */
+@media (max-width: 576px) {
+    .designer-container {
+        padding: 0 0.8rem;
+    }
+
+    .designer-header {
+        padding: 0.8rem;
+        border-radius: 12px;
+    }
+
+    .designer-title {
+        font-size: 1.5rem;
+    }
+
+    .designer-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .designer-grid {
+        gap: 1rem;
+    }
+}
+
+/* Soporte para pantallas muy grandes */
+@media (min-width: 2000px) {
+    .designer-container {
+        max-width: 2000px;
+    }
+
+    .designer-grid {
+        grid-template-columns: 320px 1fr 320px;
+        gap: 2rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.designer-sidebar,
+.designer-main,
+.designer-variants {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.designer-sidebar { animation-delay: 0.1s; }
+.designer-main { animation-delay: 0.2s; }
+.designer-variants { animation-delay: 0.3s; }

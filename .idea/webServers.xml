@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="496bcde2-04c1-4317-a7ba-cdd1da121d4d" name="Mi repo" url="http://localhost">
+        <fileTransfer mountedRoot="E:\New folder\Mi repo" accessType="MOUNT" port="0" />
+      </webServer>
+    </option>
+  </component>
+</project>
