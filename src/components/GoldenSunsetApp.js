@@ -6,7 +6,8 @@ import ProductRow from "./Home/ProductRow";
 import PreFooter from "./Home/PreFooter";
 import Footer from "./Home/Footer";
 import {get_categories_enable} from "../hooks/get_category";
-import AboutUsSection from "./Home/AboutUsSection";
+import DesignsGallery from "./Home/DesignsGallery";
+
 
 const GoldenSunsetApp = () => {
     const [category,setCategory] = useState([]);
@@ -27,7 +28,7 @@ useEffect(() => {
             <Carousel/>
             <ProductRow category={category} />
             <PreFooter/>
-            <AboutUsSection/>
+            <DesignsGallery/>
             <Footer/>
         </>
     );
