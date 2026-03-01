@@ -17,6 +17,9 @@ const ProductResolver = ({ product, children }) => {
             case 'Plates':
                 navigate(`/designer/plates/${product.id}`);
                 break;
+            case 'Caps':
+                navigate(`/designer/caps/${product.id}`);
+                break;
             default:
                 navigate(`/product/${product.id}`);
         }

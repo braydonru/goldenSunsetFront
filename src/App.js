@@ -27,6 +27,7 @@ import Reviews from "./components/Home/Reviews";
 import Designs from "./components/Home/Designs";
 import ListDesigns from "./components/Manage/ListDesign";
 import ListUsers from "./components/Manage/ListUsers";
+import ForCaps from "./components/Designs/ForCaps";
 
 const App = () => {
     return (
@@ -49,6 +50,11 @@ const App = () => {
             <Route path="/designer/plates/:id" element={
                 <ProtectedRoute>
                     <ForPlates/>
+                </ProtectedRoute>
+            }/>
+            <Route path="/designer/caps/:id" element={
+                <ProtectedRoute>
+                    <ForCaps/>
                 </ProtectedRoute>
             } />
             <Route path="/designer/mug/:id" element={
