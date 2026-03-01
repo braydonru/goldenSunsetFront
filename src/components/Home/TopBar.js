@@ -39,7 +39,12 @@ const TopBar = () => {
                 <div className="row align-items-center py-3 px-xl-5">
                     <div className="col-lg-6 d-none d-lg-block">
 
-                            <h1 className="m-0 display-5 font-weight-semi-bold" style={{color: "#EFB810"}}>
+                            <h1 className="m-0 display-5 font-weight-semi-bold" style={{
+                                background: 'linear-gradient(135deg, #CD7F32, #DAA520)',
+                                color: 'transparent',
+                                WebkitBackgroundClip: 'text',
+                                backgroundClip: 'text',
+                                display: 'inline-block'}}>
                                 Golden Sunset Made by Josh
                             </h1>
                     </div>
