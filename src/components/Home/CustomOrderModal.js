@@ -18,7 +18,7 @@ const CustomOrderModal = ({ design, onClose }) => {
     const [colors, setColors] = useState([]);
     const [loadingColors, setLoadingColors] = useState(true);
 
-    const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL','3XL', '4XL', '5XL'];
+    const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
 
     // Cargar colores desde el backend
     useEffect(() => {
@@ -44,8 +44,6 @@ const CustomOrderModal = ({ design, onClose }) => {
 
     const validate = () => {
         const newErrors = {};
-        if (!formData.size) newErrors.size = 'Please select a size';
-        if (!formData.color) newErrors.color = 'Please select a color';
         if (!user) newErrors.auth = 'You must be logged in';
         return newErrors;
     };
@@ -118,13 +116,13 @@ const CustomOrderModal = ({ design, onClose }) => {
 
             const formDataToSend = new FormData();
 
-            // Datos básicos
+            // Datos básicos - size y color son opcionales, enviamos '-' si están vacíos
             formDataToSend.append('user', user.id.toString());
-            formDataToSend.append('size', formData.size);
-            formDataToSend.append('color', formData.color);
-            formDataToSend.append('type', 'Pullover');
-            formDataToSend.append('font', 'Arial');
-            formDataToSend.append('variation', design.category || '');
+            formDataToSend.append('size', formData.size || '-');
+            formDataToSend.append('color', formData.color || '-');
+            formDataToSend.append('type', '-');
+            formDataToSend.append('font', '-');
+            formDataToSend.append('variation', design.category || '-');
 
             // Combinar especificaciones
             const fullSpecification = [
@@ -137,7 +135,10 @@ const CustomOrderModal = ({ design, onClose }) => {
             // Agregar la imagen del diseño
             formDataToSend.append('client_img', imageFile);
 
-            console.log('📤 Enviando orden con color:', formData.color);
+            console.log('📤 Enviando orden:', {
+                size: formData.size || 'not specified',
+                color: formData.color || 'not specified'
+            });
 
             const response = await fetch(`${ENV.API_URL}/order/create`, {
                 method: 'POST',
@@ -202,42 +203,39 @@ const CustomOrderModal = ({ design, onClose }) => {
                 )}
 
                 <form onSubmit={handleSubmit} className="custom-order-form">
+                    <label style={{color: "red", marginLeft: '15%'}}>For clothing items, please select size and
+                        color*</label>
                     <div className="custom-order-form-row">
                         <div className="custom-order-form-group">
                             <label>
-                                <FaRuler /> Size <span className="required">*</span>
+                                <FaRuler/> Size (Optional)
                             </label>
                             <select
                                 value={formData.size}
                                 onChange={(e) => {
                                     setFormData({...formData, size: e.target.value});
-                                    setErrors({...errors, size: null});
                                 }}
-                                className={errors.size ? 'error' : ''}
                                 disabled={loading || imageLoading || loadingColors}
                             >
-                                <option value="">Select a size</option>
+                                <option value="">-- Select size (optional) --</option>
                                 {sizes.map(size => (
                                     <option key={size} value={size}>{size}</option>
                                 ))}
                             </select>
-                            {errors.size && <span className="error-message">{errors.size}</span>}
                         </div>
 
                         <div className="custom-order-form-group">
                             <label>
-                                <FaPalette /> Color <span className="required">*</span>
+                                <FaPalette/> Color (Optional)
                             </label>
                             <select
                                 value={formData.color}
                                 onChange={(e) => {
                                     setFormData({...formData, color: e.target.value});
-                                    setErrors({...errors, color: null});
                                 }}
-                                className={errors.color ? 'error' : ''}
                                 disabled={loading || imageLoading || loadingColors}
                             >
-                                <option value="">Select a color</option>
+                                <option value="">-- Select color (optional) --</option>
                                 {loadingColors ? (
                                     <option disabled>Loading colors...</option>
                                 ) : (
@@ -248,7 +246,6 @@ const CustomOrderModal = ({ design, onClose }) => {
                                     ))
                                 )}
                             </select>
-                            {errors.color && <span className="error-message">{errors.color}</span>}
                             {!loadingColors && colors.length === 0 && (
                                 <small className="helper-text">No colors available</small>
                             )}
@@ -256,7 +253,7 @@ const CustomOrderModal = ({ design, onClose }) => {
                     </div>
 
                     <div className="custom-order-form-group">
-                        <label>Specifications</label>
+                        <label>Specifications (Optional)</label>
                         <textarea
                             rows="3"
                             placeholder="e.g., Front print, long sleeves, etc."
@@ -265,8 +262,6 @@ const CustomOrderModal = ({ design, onClose }) => {
                             disabled={loading || imageLoading}
                         />
                     </div>
-
-
 
                     {imageLoading && (
                         <div className="custom-order-loading">
