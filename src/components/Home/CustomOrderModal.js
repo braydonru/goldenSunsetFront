@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTimes, FaShoppingCart, FaPalette, FaRuler } from 'react-icons/fa';
+import {FaTimes, FaShoppingCart, FaPalette, FaRuler, FaCheckCircle} from 'react-icons/fa';
 import { ENV } from '../../conf/env';
 import { useAuthStore } from '../../store/auth.store';
 import { get_colors_all } from '../../hooks/get_colors';
@@ -17,6 +17,9 @@ const CustomOrderModal = ({ design, onClose }) => {
     const [imageLoading, setImageLoading] = useState(false);
     const [colors, setColors] = useState([]);
     const [loadingColors, setLoadingColors] = useState(true);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [orderId, setOrderId] = useState(null);
 
     const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
 
@@ -155,9 +158,17 @@ const CustomOrderModal = ({ design, onClose }) => {
             }
 
             const result = await response.json();
+            setOrderId(result.order_id);
 
-            alert(`✅ Order created successfully! Order ID: ${result.order_id}`);
-            onClose();
+            // Mostrar mensaje de éxito
+            setSuccessMessage(`✅ Order created successfully! Order ID: ${result.order_id}`);
+            setShowSuccess(true);
+
+            // Cerrar el modal después de 2 segundos
+            setTimeout(() => {
+                setShowSuccess(false);
+                onClose();
+            }, 2000);
 
         } catch (error) {
             console.error('Error creating order:', error);
@@ -178,6 +189,17 @@ const CustomOrderModal = ({ design, onClose }) => {
                         <FaTimes />
                     </button>
                 </div>
+
+                {/* Mensaje de éxito elegante */}
+                {showSuccess && (
+                    <div className="order-success-message">
+                        <FaCheckCircle className="success-icon"/>
+                        <div className="success-content">
+                            <strong>Success!</strong>
+                            <p>{successMessage}</p>
+                        </div>
+                    </div>
+                )}
 
                 <div className="custom-order-design-preview">
                     <img
@@ -215,7 +237,7 @@ const CustomOrderModal = ({ design, onClose }) => {
                                 onChange={(e) => {
                                     setFormData({...formData, size: e.target.value});
                                 }}
-                                disabled={loading || imageLoading || loadingColors}
+                                disabled={loading || imageLoading || loadingColors || showSuccess}
                             >
                                 <option value="">-- Select size (optional) --</option>
                                 {sizes.map(size => (
@@ -233,7 +255,7 @@ const CustomOrderModal = ({ design, onClose }) => {
                                 onChange={(e) => {
                                     setFormData({...formData, color: e.target.value});
                                 }}
-                                disabled={loading || imageLoading || loadingColors}
+                                disabled={loading || imageLoading || loadingColors || showSuccess}
                             >
                                 <option value="">-- Select color (optional) --</option>
                                 {loadingColors ? (
@@ -259,7 +281,7 @@ const CustomOrderModal = ({ design, onClose }) => {
                             placeholder="e.g., Front print, long sleeves, etc."
                             value={formData.specifications}
                             onChange={(e) => setFormData({...formData, specifications: e.target.value})}
-                            disabled={loading || imageLoading}
+                            disabled={loading || imageLoading || showSuccess}
                         />
                     </div>
 
@@ -282,11 +304,13 @@ const CustomOrderModal = ({ design, onClose }) => {
                     )}
 
                     <div className="custom-order-form-actions">
-                        <button type="button" className="custom-order-cancel-btn" onClick={onClose} disabled={loading || imageLoading}>
+                        <button type="button" className="custom-order-cancel-btn" onClick={onClose}
+                                disabled={loading || imageLoading || showSuccess}>
                             Cancel
                         </button>
-                        <button type="submit" className="custom-order-submit-btn" disabled={loading || imageLoading || loadingColors}>
-                            {loading ? 'Creating...' : imageLoading ? 'Loading image...' : loadingColors ? 'Loading colors...' : 'Create Order'}
+                        <button type="submit" className="custom-order-submit-btn"
+                                disabled={loading || imageLoading || loadingColors || showSuccess}>
+                            {loading ? 'Creating...' : imageLoading ? 'Loading image...' : loadingColors ? 'Loading colors...' : showSuccess ? 'Order Created!' : 'Create Order'}
                         </button>
                     </div>
                 </form>

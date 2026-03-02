@@ -325,3 +325,56 @@
     color: #ff6b6b;
     margin-left: 4px;
 }
+
+/* Mensaje de éxito elegante */
+.order-success-message {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    padding: 15px 20px;
+    margin: 15px 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    animation: slideDown 0.3s ease;
+}
+
+.success-icon {
+    font-size: 24px;
+    color: white;
+}
+
+.success-content {
+    flex: 1;
+}
+
+.success-content strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.success-content p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Deshabilitar campos mientras se muestra el éxito */
+.custom-order-form-group select:disabled,
+.custom-order-form-group textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
