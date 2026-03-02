@@ -8,10 +8,10 @@ const ProductResolver = ({ product, children }) => {
             case 'Pullovers':
                 navigate(`/designer/shirt/${product.id}`);
                 break;
-            case 'Cups':
+            case 'Mugs':
                 navigate(`/designer/mug/${product.id}`);
                 break;
-            case 'Thermos':
+            case 'Tumblers':
                 navigate(`/designer/thermo/${product.id}`);
                 break;
             case 'Plates':
