@@ -84,6 +84,8 @@ const OrderVisualizer = ({ orden, onClose }) => {
         preview_img,
         preview_img_back,
         variation,
+        qantity,
+        price
     } = orden || {};
 
     const [frontImageLoaded, setFrontImageLoaded] = useState(false);
@@ -268,6 +270,12 @@ const OrderVisualizer = ({ orden, onClose }) => {
                             </div>
                             <div className="detalle-item">
                                 <span>Variation:</span> {variation}
+                            </div>
+                            <div className="detalle-item">
+                                <span>Quantity:</span> {qantity}
+                            </div>
+                            <div className="detalle-item">
+                                <span>Price:</span> {price}
                             </div>
 
                             {/* Indicador de diseños disponibles */}

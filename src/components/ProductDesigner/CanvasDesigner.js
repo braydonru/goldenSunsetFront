@@ -2,11 +2,18 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { useDesignerStore } from "../Designs/designer.store"
 import { useAuthStore } from "../../store/auth.store"
 import { ENV } from "../../conf/env"
+import {useParams} from "react-router-dom"
 
 export default function DesignerCanvas() {
+    const resetDesignerState = useDesignerStore(s => s.resetDesignerState);
 
+    useEffect(() => {
+        // Resetear el estado al montar el componente
+        resetDesignerState();
+    }, [resetDesignerState]);
+
+    const {id} = useParams();
     const { user } = useAuthStore()
-
     const size = useDesignerStore(s => s.size)
     const font = useDesignerStore(s => s.font)
     const selectedColor = useDesignerStore(s => s.selectedColor)
@@ -17,8 +24,15 @@ export default function DesignerCanvas() {
     const canvasRef = useRef(null)
     const shirtImgRef = useRef(null)
 
+    // Estados para el producto
+    const [product, setProduct] = useState(null);
+    const [productLoading, setProductLoading] = useState(true);
+    const [basePrice, setBasePrice] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
+
     const [activeSide, setActiveSide] = useState("front")
     const [currentText, setCurrentText] = useState("")
+    const [currentQuantity, setCurrentQuantity] = useState(0)
     const [textSize, setTextSize] = useState(32)
     const [textColor, setTextColor] = useState("#ffffff")
     const [isLoading, setIsLoading] = useState(false)
@@ -31,7 +45,7 @@ export default function DesignerCanvas() {
     // Estados para arrastrar texto
     const [isDragging, setIsDragging] = useState(false)
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
-    const [selectedElement, setSelectedElement] = useState(null) // 'text' o 'image'
+    const [selectedElement, setSelectedElement] = useState(null)
 
     // Estados para control de imagen
     const [imageScale, setImageScale] = useState(0.5)
@@ -60,12 +74,66 @@ export default function DesignerCanvas() {
     const getCurrentState = () =>
         activeSide === "front" ? frontState.current : backState.current
 
-    // Verificar si ambas caras están personalizadas
-    const isDoubleSided = () => {
+    // ================= FUNCIÓN isDoubleSided (DEFINIDA ANTES DE USARSE) =================
+    const isDoubleSided = useCallback(() => {
         const frontCustomized = frontState.current.image !== null || frontState.current.text !== "";
         const backCustomized = backState.current.image !== null || backState.current.text !== "";
         return frontCustomized && backCustomized;
-    }
+    }, []);
+
+    // ================= OBTENER PRODUCTO =================
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                setProductLoading(true);
+                const response = await fetch(`${ENV.API_URL}/product/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error fetching product');
+
+                const data = await response.json();
+                setProduct(data);
+                setBasePrice(data.price || 0);
+
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                setValidationError('Could not load product details');
+                setShowValidation(true);
+            } finally {
+                setProductLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchProduct();
+        }
+    }, [id]);
+
+    // ================= CALCULAR PRECIO TOTAL =================
+    useEffect(() => {
+        let price = basePrice;
+
+        // Aplicar multiplicador por cantidad
+
+
+        // Aplicar costo adicional por doble cara
+        if (isDoubleSided()) {
+            price += 2.00;
+        }
+        if (size === '3XL') {
+            price += 5;
+        }
+        if (size === '4XL' || size === '5XL') {
+            price += 7;
+        }
+
+        price *= currentQuantity;
+
+        setTotalPrice(price);
+    }, [basePrice, currentQuantity, isDoubleSided]);
 
     // Cargar colores disponibles y seleccionar el primero por defecto
     useEffect(() => {
@@ -429,6 +497,11 @@ export default function DesignerCanvas() {
         }
     }
 
+    const handleQuantityChange = (e) => {
+        const value = parseInt(e.target.value) || 1;
+        setCurrentQuantity(Math.max(1, value));
+    }
+
     const handleTextSizeChange = (e) => {
         const value = parseInt(e.target.value)
         setTextSize(value)
@@ -499,6 +572,12 @@ export default function DesignerCanvas() {
             return
         }
 
+        if (currentQuantity == 0) {
+            setValidationError("Please select a quantity first")
+            setShowValidation(true)
+            return
+        }
+
         if (!isCustomized()) {
             setValidationError("Please customize your pullover with an image or text before creating an order")
             setShowValidation(true)
@@ -520,6 +599,9 @@ export default function DesignerCanvas() {
             formData.append("specification", specification || "")
             formData.append("font", font || "Arial")
             formData.append("variation", selectedVariant.name)
+            formData.append("qantity", currentQuantity.toString())
+            formData.append("price", totalPrice)
+
             // Guardar el lado actual para restaurarlo después
             const currentSide = activeSide
 
@@ -606,6 +688,29 @@ export default function DesignerCanvas() {
     const hasText = currentState.text !== ""
     const doubleSided = isDoubleSided()
 
+    if (productLoading) {
+        return (
+            <div style={{textAlign: 'center', padding: '50px'}}>
+                <div className="spinner"></div>
+                <p>Loading product...</p>
+                <style>{`
+                    .spinner {
+                        width: 40px;
+                        height: 40px;
+                        border: 4px solid #f3f3f3;
+                        border-top-color: #6a5acd;
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 15px;
+                    }
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
     return (
         <div style={{
             maxWidth: 520,
@@ -619,7 +724,7 @@ export default function DesignerCanvas() {
         }}>
 
             <h2 style={{ textAlign: "center", marginBottom: 20, color: "#333" }}>
-                🎨 Design Your Pullover
+                🎨 Design Your {product?.name || 'Pullover'}
             </h2>
 
             {selectedColor && (
@@ -728,6 +833,7 @@ export default function DesignerCanvas() {
                     </div>
                 </div>
             )}
+
 
             <div style={{ marginBottom: 10, fontSize: 13, color: "#666", textAlign: "center" }}>
                 💡 Click and drag on text or image to move it
@@ -867,6 +973,17 @@ export default function DesignerCanvas() {
                 </div>
             )}
 
+            <div style={{marginBottom: 15}}>
+                <label style={labelStyle}>Quantity</label>
+                <input
+                    type="number"
+                    min="1"
+                    value={currentQuantity}
+                    onChange={handleQuantityChange}
+                    style={inputStyle}
+                />
+            </div>
+
             {/* Mensaje de validación personalizado */}
             {showValidation && validationError && (
                 <div style={{
@@ -901,6 +1018,23 @@ export default function DesignerCanvas() {
                     </button>
                 </div>
             )}
+
+
+            {/* Mostrar precio */}
+            <div style={{
+                marginBottom: 15,
+                padding: "15px",
+                borderRadius: 8,
+                background: "linear-gradient(135deg, #6a5acd 0%, #8a7ad9 100%)",
+                color: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                boxShadow: "0 4px 12px rgba(106, 90, 205, 0.3)"
+            }}>
+                <span style={{fontSize: 16, fontWeight: 500}}>Total Price:</span>
+                <span style={{fontSize: 24, fontWeight: 700}}>${totalPrice.toFixed(2)}</span>
+            </div>
 
             <button
                 onClick={createOrder}

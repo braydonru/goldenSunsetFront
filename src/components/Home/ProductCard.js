@@ -23,7 +23,7 @@ const ProductCard = ({product}) => {
                             e.target.src = placeholderImage;
                             e.target.onerror = null; // Evita loop infinito
                         }}
-                        loading="lazy" // Carga perezosa para mejor rendimiento
+                        loading="lazy"
                     />
                 </Link>
                 {!enable && (

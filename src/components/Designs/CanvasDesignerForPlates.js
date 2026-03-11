@@ -3,6 +3,7 @@ import { useAuthStore } from '../../store/auth.store'
 import { ENV } from "../../conf/env";
 import { useDesignerStore } from "./designer.store";
 import ViewerForPlates from '../MugDesigner3D/ViewerForPlates';
+import {useParams} from "react-router-dom";
 
 // Mapeo de tamaños a dimensiones de canvas
 const SIZE_TO_CANVAS = {
@@ -24,6 +25,14 @@ const getImageUrl = (path) => {
 };
 
 export default function DesignerCanvas() {
+    const {id} = useParams();
+    const resetDesignerState = useDesignerStore(s => s.resetDesignerState);
+
+    useEffect(() => {
+        // Resetear el estado al montar el componente
+        resetDesignerState();
+    }, [resetDesignerState]);
+
     const { user, access_token } = useAuthStore()
     const canvasRef = useRef(null)
     const viewerRef = useRef(null)
@@ -57,6 +66,55 @@ export default function DesignerCanvas() {
         scale: 0.5,
         rotation: 0
     })
+
+    const [currentQuantity, setCurrentQuantity] = useState(1)
+    const [productLoading, setProductLoading] = useState(true);
+    const [product, setProduct] = useState(null);
+    const [basePrice, setBasePrice] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [validationError, setValidationError] = useState("")
+    const [showValidation, setShowValidation] = useState(false)
+
+    // ================= OBTENER PRODUCTO =================
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                setProductLoading(true);
+                const response = await fetch(`${ENV.API_URL}/product/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error fetching product');
+
+                const data = await response.json();
+                setProduct(data);
+                setBasePrice(data.price || 0);
+
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                setValidationError('Could not load product details');
+                setShowValidation(true);
+            } finally {
+                setProductLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchProduct();
+        }
+    }, [id]);
+
+    // ================= CALCULAR PRECIO TOTAL =================
+    useEffect(() => {
+        let price = basePrice;
+
+        price *= currentQuantity;
+
+        setTotalPrice(price);
+    }, [basePrice, currentQuantity]);
+
 
     // Detectar Car Plate
     const isCarPlate = useCallback(() => {
@@ -173,6 +231,12 @@ export default function DesignerCanvas() {
             setSuccessMessage("")
         }, 3000)
     }
+
+    const handleQuantityChange = (e) => {
+        const value = parseInt(e.target.value) || 1;
+        setCurrentQuantity(Math.max(1, value));
+    }
+
 
     // Manejar upload de imagen
     const handleImageUpload = useCallback((e) => {
@@ -336,6 +400,8 @@ export default function DesignerCanvas() {
             formData.append('color', '-')
             formData.append('font', '-')
             formData.append('size', size || '')
+            formData.append('qantity', currentQuantity)
+            formData.append('price', totalPrice)
             formData.append('variation', selectedVariant?.name || '')
             if (specification) formData.append('specification', specification)
             if (uploadedImage) formData.append('client_img', uploadedImage, `design_${Date.now()}.png`)
@@ -566,6 +632,33 @@ export default function DesignerCanvas() {
                 )}
             </div>
 
+            {/* Mostrar precio */}
+            <div style={{
+                marginBottom: 15,
+                padding: "15px",
+                borderRadius: 8,
+                background: "linear-gradient(135deg, #6a5acd 0%, #8a7ad9 100%)",
+                color: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                boxShadow: "0 4px 12px rgba(106, 90, 205, 0.3)"
+            }}>
+                <span style={{fontSize: 16, fontWeight: 500}}>Total Price:</span>
+                <span style={{fontSize: 24, fontWeight: 700}}>${totalPrice.toFixed(2)}</span>
+            </div>
+
+            <div style={{marginBottom: 15}}>
+                <label style={labelStyle}>Quantity</label>
+                <input
+                    type="number"
+                    min="1"
+                    value={currentQuantity}
+                    onChange={handleQuantityChange}
+                    style={inputStyle}
+                />
+            </div>
+
             <button
                 onClick={createOrder}
                 style={{
@@ -611,4 +704,22 @@ const btnStyle = {
     transition: 'all 0.3s',
     display: 'block',
     width: '100%'
+}
+
+const inputStyle = {
+    width: "100%",
+    padding: 10,
+    borderRadius: 6,
+    border: "1px solid #ddd",
+    fontSize: 14,
+    marginTop: 4
+}
+
+const labelStyle = {
+    display: "block",
+    fontSize: 13,
+    fontWeight: 600,
+    color: "#666",
+    marginBottom: 4,
+    textTransform: "uppercase"
 }

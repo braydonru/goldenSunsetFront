@@ -25,7 +25,7 @@ const ShowOrder = () => {
             const response = await fetch(`${ENV.API_URL}/order/order/${orderId}`);
 
             if (!response.ok) {
-                throw new Error('Error al cargar la orden');
+                throw new Error('Error loading order');
             }
 
             const data = await response.json();
@@ -45,6 +45,8 @@ console.log(data)
                 client_img_back: data.client_img_back,
                 preview_img_back: data.preview_img_back,
                 variation: data.variation,
+                qantity: data.qantity,
+                price: data.price,
             };
 
             setOrden(formattedData);

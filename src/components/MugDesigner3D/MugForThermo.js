@@ -6,13 +6,17 @@ import { ENV } from "../../conf/env";
 import { useAuthStore } from '../../store/auth.store'
 import CustomizerForThermo from "./CustomizerForThermo";
 import ViewerForThermo from "./ViewerForThermo";
+import {useParams} from "react-router-dom";
+import {useDesignerStore} from "../Designs/designer.store";
 
 export default function MugForThermo() {
+    const {id} = useParams();
     const [textureUrl, setTextureUrl] = useState(null);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState(null);
-
+    const quantity = useDesignerStore(state => state.quantity);
+    const totalprice = useDesignerStore(state => state.totalprice);
     const { user } = useAuthStore();
 
     const handleImageUpload = (objectUrl, file) => {
@@ -41,6 +45,8 @@ export default function MugForThermo() {
             formData.append('type', 'Thermo');
             formData.append('client_img', file);
             formData.append('preview_img', file);
+            formData.append("qantity", quantity.toString())
+            formData.append("price", totalprice)
 
             const res = await fetch(`${ENV.API_URL}/order/create`, {
                 method: 'POST',
@@ -52,11 +58,11 @@ export default function MugForThermo() {
 
             if (!res.ok) throw new Error();
 
-            setToast({ message: '✅ Orden creada correctamente', type: 'success' });
+            setToast({message: '✅ Order created successfully', type: 'success'});
             handleReset();
 
         } catch {
-            setToast({ message: '❌ Error al crear la orden', type: 'error' });
+            setToast({message: '❌ Error creating order', type: 'error'});
         } finally {
             setLoading(false);
         }
@@ -82,6 +88,7 @@ export default function MugForThermo() {
                         currentImage={textureUrl}
                         onImageUpload={handleImageUpload}
                         onReset={handleReset}
+                        id={id}
                     />
 
                     <button
@@ -99,7 +106,7 @@ export default function MugForThermo() {
                             cursor: 'pointer'
                         }}
                     >
-                        {loading ? 'Creando orden...' : 'Crear orden'}
+                        {loading ? 'Creating order...' : 'Create order'}
                     </button>
                 </div>
             </div>

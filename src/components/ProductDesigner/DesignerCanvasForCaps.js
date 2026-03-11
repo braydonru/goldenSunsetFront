@@ -2,11 +2,12 @@ import {useEffect, useRef, useState, useCallback} from "react"
 import {useDesignerStore} from "../Designs/designer.store"
 import {useAuthStore} from "../../store/auth.store"
 import {ENV} from "../../conf/env"
+import {useParams} from "react-router-dom";
 
 export default function DesignerCanvasForCaps() {
 
     const {user} = useAuthStore()
-
+    const {id} = useParams();
     const size = useDesignerStore(s => s.size)
     const font = useDesignerStore(s => s.font)
     const selectedColor = useDesignerStore(s => s.selectedColor)
@@ -16,7 +17,11 @@ export default function DesignerCanvasForCaps() {
 
     const canvasRef = useRef(null)
     const capImgRef = useRef(null)
-
+    const [currentQuantity, setCurrentQuantity] = useState(1)
+    const [product, setProduct] = useState(null);
+    const [productLoading, setProductLoading] = useState(true);
+    const [basePrice, setBasePrice] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
     const [currentText, setCurrentText] = useState("")
     const [textSize, setTextSize] = useState(28)
     const [textColor, setTextColor] = useState("#ffffff")
@@ -56,6 +61,47 @@ export default function DesignerCanvasForCaps() {
     }
 
     const getCurrentState = () => capState.current
+
+    // ================= OBTENER PRODUCTO =================
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                setProductLoading(true);
+                const response = await fetch(`${ENV.API_URL}/product/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error fetching product');
+
+                const data = await response.json();
+                setProduct(data);
+                setBasePrice(data.price || 0);
+
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                setValidationError('Could not load product details');
+                setShowValidation(true);
+            } finally {
+                setProductLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchProduct();
+        }
+    }, [id]);
+
+    // ================= CALCULAR PRECIO TOTAL =================
+    useEffect(() => {
+        let price = basePrice;
+
+        price *= currentQuantity;
+
+        setTotalPrice(price);
+    }, [basePrice, currentQuantity]);
+
 
     // Cargar colores disponibles y seleccionar el primero por defecto
     useEffect(() => {
@@ -414,6 +460,11 @@ export default function DesignerCanvasForCaps() {
         drawCanvas()
     }
 
+    const handleQuantityChange = (e) => {
+        const value = parseInt(e.target.value) || 1;
+        setCurrentQuantity(Math.max(1, value));
+    }
+
     const handleTextColorChange = (e) => {
         const value = e.target.value
         setTextColor(value)
@@ -469,11 +520,6 @@ export default function DesignerCanvasForCaps() {
             return
         }
 
-        if (!size) {
-            setValidationError("Please select a size first")
-            setShowValidation(true)
-            return
-        }
 
         if (!isCustomized()) {
             setValidationError("Please customize your cap with an image or text before creating an order")
@@ -496,6 +542,8 @@ export default function DesignerCanvasForCaps() {
             formData.append("specification", specification || "")
             formData.append("font", font || "Arial")
             formData.append("variation", selectedVariant?.name || "Cap")
+            formData.append("qantity", currentQuantity)
+            formData.append("price", totalPrice)
 
             // Generar preview
             const preview = await generatePreviewImage()
@@ -550,7 +598,7 @@ export default function DesignerCanvasForCaps() {
     return (
         <div style={{
             maxWidth: 520,
-            margin: "40px auto",
+            margin: "auto",
             padding: 30,
             background: "white",
             borderRadius: 16,
@@ -792,6 +840,32 @@ export default function DesignerCanvasForCaps() {
                 </div>
             )}
 
+            <div style={{marginBottom: 15}}>
+                <label style={labelStyle}>Quantity</label>
+                <input
+                    type="number"
+                    min="1"
+                    value={currentQuantity}
+                    onChange={handleQuantityChange}
+                    style={inputStyle}
+                />
+            </div>
+
+            {/* Mostrar precio */}
+            <div style={{
+                marginBottom: 15,
+                padding: "15px",
+                borderRadius: 8,
+                background: "linear-gradient(135deg, #6a5acd 0%, #8a7ad9 100%)",
+                color: "white",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                boxShadow: "0 4px 12px rgba(106, 90, 205, 0.3)"
+            }}>
+                <span style={{fontSize: 16, fontWeight: 500}}>Total Price:</span>
+                <span style={{fontSize: 24, fontWeight: 700}}>${totalPrice.toFixed(2)}</span>
+            </div>
             <button
                 onClick={createOrder}
                 disabled={isLoading}

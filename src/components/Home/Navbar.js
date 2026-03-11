@@ -44,19 +44,6 @@ const Navbar = () => {
                                 )}
                             </div>
 
-                            {/* RIGHT LINKS */}
-                            <div className="navbar-nav ml-auto py-0">
-                                {!isAuthenticated ? (
-                                    <>
-                                        <Link to="/login" className="nav-item nav-link">Login</Link>
-                                        <Link to="/register" className="nav-item nav-link">Register</Link>
-                                    </>
-                                ) : (
-                                    <span className="nav-item nav-link">
-                                        <button onClick={clearAuth} className={'btn btn-link'}>LogOut</button>
-                                    </span>
-                                )}
-                            </div>
 
                         </div>
                     </nav>

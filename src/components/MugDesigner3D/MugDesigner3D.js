@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import MugViewer from './MugViewer';
 import MugCustomizer from './MugCustomizer';
 import Toast from './Toast';
 import { ENV } from "../../conf/env";
 import { useAuthStore } from '../../store/auth.store'
 import {useDesignerStore} from "../Designs/designer.store";
+import {useParams} from "react-router-dom";
+import {error} from "three";
 
 export default function MugEditor() {
+    const {id} = useParams();
     const [textureUrl, setTextureUrl] = useState(null);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState(null);
     const selectedVariant = useDesignerStore(state => state.selectedVariant);
+    const quantity = useDesignerStore(state => state.quantity);
+    const totalprice = useDesignerStore(state => state.totalprice);
     const { user } = useAuthStore();
+
 
     const handleImageUpload = (objectUrl, file) => {
         setTextureUrl(objectUrl);
@@ -24,23 +30,28 @@ export default function MugEditor() {
         setFile(null);
     };
 
+
     const handleCreateOrder = async () => {
         if (!file) {
-            setToast({ message: 'Debes subir una imagen', type: 'error' });
+            setToast({message: 'You need to upload an image', type: 'error'});
             return;
         }
 
         try {
+
             setLoading(true);
 
             const formData = new FormData();
             formData.append('user', user.id);
             formData.append('size', 'standard');
             formData.append('color', 'White');
-            formData.append('type', 'Cup');
+            formData.append('type', 'Mug');
             formData.append('client_img', file);
             formData.append('preview_img', file);
-            formData.append("variation", selectedVariant.name)
+            formData.append("variation", selectedVariant?.name || 'Standard')
+            formData.append("qantity", quantity.toString())
+            formData.append("price", totalprice)
+
 
             const res = await fetch(`${ENV.API_URL}/order/create`, {
                 method: 'POST',
@@ -52,11 +63,11 @@ export default function MugEditor() {
 
             if (!res.ok) throw new Error();
 
-            setToast({ message: '✅ Orden creada correctamente', type: 'success' });
+            setToast({message: '✅ Order created successfully', type: 'success'});
             handleReset();
 
         } catch {
-            setToast({ message: '❌ Error al crear la orden', type: 'error' });
+            setToast({message: '❌ Error creating order', type: 'error'});
         } finally {
             setLoading(false);
         }
@@ -82,6 +93,7 @@ export default function MugEditor() {
                         currentImage={textureUrl}
                         onImageUpload={handleImageUpload}
                         onReset={handleReset}
+                        id={id}
                     />
 
                     <button
@@ -99,7 +111,7 @@ export default function MugEditor() {
                             cursor: 'pointer'
                         }}
                     >
-                        {loading ? 'Creando orden...' : 'Crear orden'}
+                        {loading ? 'Creating order...' : 'Create order'}
                     </button>
                 </div>
             </div>

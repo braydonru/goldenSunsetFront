@@ -12,7 +12,7 @@ const ForCups = () => {
             <Navbar/>
             <div className="row align-items-start" style={{width:'98%', marginLeft:'2%'}}>
                 <div className="col-3">
-                    <VariantSelector category={'Cups'}/>
+                    <VariantSelector category={'Mugs'}/>
                 </div>
                 <div className="col-6">
                     <MugEditor/>

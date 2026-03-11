@@ -2,7 +2,8 @@ import React, {
     useEffect,
     Suspense,
     forwardRef,
-    useImperativeHandle
+    useImperativeHandle,
+    useRef
 } from 'react'
 import { Canvas, useLoader, useThree } from '@react-three/fiber'
 import { useGLTF, OrbitControls, Html } from '@react-three/drei'
@@ -23,35 +24,85 @@ function ExposeCanvas({ innerRef }) {
     return null
 }
 
-function Mug({ textureUrl }) {
+// COMPONENTE PLACA CORREGIDO
+function Placa({textureUrl}) {
     const { scene } = useGLTF('/Placa.glb')
     const texture = useLoader(TextureLoader, textureUrl || placeholderBase64)
+    const previousTextureUrlRef = useRef(textureUrl)
 
     useEffect(() => {
-        if (!scene || !texture) return
+        if (!scene) return
 
+        // Guardar referencia para el cleanup
+        previousTextureUrlRef.current = textureUrl
+
+        // Caso 1: RESET - No hay textureUrl
+        if (!textureUrl) {
+            scene.traverse((child) => {
+                if (!child.isMesh) return
+
+                // Manejar tanto materiales únicos como arrays de materiales
+                const materials = Array.isArray(child.material)
+                    ? child.material
+                    : [child.material]
+
+                materials.forEach(material => {
+                    // Limpiar textura si existe
+                    if (material.map) {
+                        material.map.dispose() // IMPORTANTE: liberar memoria de GPU
+                        material.map = null
+                    }
+                    // Restaurar color original
+                    material.color.set('#f2f2f2')
+                    material.needsUpdate = true
+                })
+            })
+            return
+        }
+
+        // Caso 2: Hay textureUrl - aplicar textura
+        if (!texture) return
+
+        // Configurar textura
         texture.flipY = false
         texture.colorSpace = THREE.SRGBColorSpace
         texture.wrapS = THREE.ClampToEdgeWrapping
         texture.wrapT = THREE.ClampToEdgeWrapping
         texture.needsUpdate = true
 
+        // Aplicar a la malla
         scene.traverse((child) => {
             if (!child.isMesh) return
 
-            const material = child.material
+            const materials = Array.isArray(child.material)
+                ? child.material
+                : [child.material]
 
-            if (material.name === 'foto' && textureUrl) {
-                material.map = texture
-                material.needsUpdate = true
-            }
+            materials.forEach(material => {
+                // Limpiar textura anterior si es diferente
+                if (material.map && material.map !== texture) {
+                    material.map.dispose()
+                }
 
-            if (material.name !== 'foto') {
-                material.map = null
-                material.color.set('#f2f2f2')
+                // Solo aplicar textura al material llamado 'foto'
+                if (material.name === 'foto') {
+                    material.map = texture
+                    material.color.set('#ffffff') // Blanco para que la textura se vea bien
+                } else {
+                    material.map = null
+                    material.color.set('#f2f2f2')
+                }
                 material.needsUpdate = true
-            }
+            })
         })
+
+        // Cleanup function para cuando el componente se desmonte o textureUrl cambie
+        return () => {
+            // Si estamos en reset o el componente se desmonta, limpiar texturas
+            if (!textureUrl && texture && texture !== textureUrl) {
+                texture.dispose()
+            }
+        }
     }, [scene, texture, textureUrl])
 
     return <primitive object={scene} scale={0.5} />
@@ -65,6 +116,8 @@ const ViewerForPlates = forwardRef(({
                                         cameraPosition = [0, 0.6, 4],
                                         cameraFov = 45
                                     }, ref) => {
+
+    console.log('ViewerForPlates textureUrl:', textureUrl)
 
     return (
         <div
@@ -104,7 +157,7 @@ const ViewerForPlates = forwardRef(({
                         </Html>
                     }
                 >
-                    <Mug textureUrl={textureUrl} />
+                    <Placa textureUrl={textureUrl}/>
 
                     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
                         <circleGeometry args={[4, 32]} />

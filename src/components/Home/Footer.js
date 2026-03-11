@@ -18,8 +18,9 @@ const Footer = () => {
                             }}>Golden
                                 Sunset Made by Josh</h1>
                         </Link>
-                        <p className="mb-2"><i className="fa fa-map-marker-alt text-primary mr-3"></i>2132 Monterrey Blvd, Hermosa Beach, CA 90254</p>
-                        <p className="mb-2"><i className="fa fa-envelope text-primary mr-3"></i>goldensunsetjosh@gmail.com</p>
+                        <p className="mb-2"><i className="fa fa-map-marker-alt text-primary mr-3"></i>California</p>
+                        <p className="mb-2"><i className="fa fa-envelope text-primary mr-3"></i><a
+                            href="mailto:goldensunsetjosh@gmail.com">goldensunsetjosh@gmail.com</a></p>
                         <p className="mb-0"><i className="fa fa-phone-alt text-primary mr-3"></i>+1(310) 629 6791</p>
                     </div>
                     <div className="col-lg-2 col-md-12 mb-5 pr-3 pr-xl-5"></div>
