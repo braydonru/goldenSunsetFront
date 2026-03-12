@@ -5,6 +5,14 @@ import {ENV} from "../../conf/env"
 import {useParams} from "react-router-dom";
 
 export default function DesignerCanvasForCaps() {
+    const resetDesignerState = useDesignerStore(s => s.resetDesignerState);
+
+    const isFirstRender = useRef(true);
+
+    if (isFirstRender.current) {
+        resetDesignerState();
+        isFirstRender.current = false;
+    }
 
     const {user} = useAuthStore()
     const {id} = useParams();
@@ -43,6 +51,7 @@ export default function DesignerCanvasForCaps() {
 
     const capState = useRef(createEmptyState())
 
+
     function createEmptyState() {
         return {
             image: null,
@@ -60,6 +69,7 @@ export default function DesignerCanvasForCaps() {
         }
     }
 
+    console.log(selectedVariant)
     const getCurrentState = () => capState.current
 
     // ================= OBTENER PRODUCTO =================
