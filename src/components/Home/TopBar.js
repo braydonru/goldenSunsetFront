@@ -13,7 +13,7 @@ const TopBar = () => {
     const {user, clearAuth} = useAuthStore();
     const navigate = useNavigate();
     const [cartCount, setCartCount] = useState(0);
-    const [showOrders, setShowOrders] = useState(false);
+    const [showCartModal, setShowCartModal] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -28,13 +28,6 @@ const TopBar = () => {
     // Estados para el mensaje de confirmación
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null);
-
-    // Cargar órdenes del usuario cuando se abre el panel
-    useEffect(() => {
-        if (showOrders && user) {
-            fetchUserOrders();
-        }
-    }, [showOrders, user]);
 
     // Función para obtener las órdenes del usuario
     const fetchUserOrders = async () => {
@@ -65,6 +58,14 @@ const TopBar = () => {
             setError('Could not load your orders');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Función para abrir el modal del carrito y cargar órdenes
+    const handleOpenCart = () => {
+        setShowCartModal(true);
+        if (user) {
+            fetchUserOrders();
         }
     };
 
@@ -129,7 +130,7 @@ const TopBar = () => {
     const handleLogout = () => {
         clearAuth();
         setShowUserMenu(false);
-        setShowOrders(false);
+        setShowCartModal(false);
         navigate('/');
     };
 
@@ -158,12 +159,11 @@ const TopBar = () => {
     const getStatusColor = () => '#ff9800';
     const getStatusText = () => 'Pending Payment';
 
-    // Cerrar menús cuando se hace clic fuera
+    // Cerrar menús cuando se hace clic fuera (solo para el menú de usuario)
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (!event.target.closest('.user-menu-container') && !event.target.closest('.cart-container')) {
+            if (!event.target.closest('.user-menu-container')) {
                 setShowUserMenu(false);
-                setShowOrders(false);
             }
         };
 
@@ -212,137 +212,14 @@ const TopBar = () => {
                                     <div className="cart-container">
                                         <button
                                             className="cart-button"
-                                            onClick={() => setShowOrders(!showOrders)}
+                                            onClick={handleOpenCart}
                                         >
                                             <FaShoppingCart className="cart-icon"/>
                                             <span className="cart-count">{cartCount}</span>
                                             <span className="cart-text">Cart</span>
                                         </button>
-
-                                        {/* Panel de órdenes */}
-                                        {showOrders && (
-                                            <div className="orders-panel">
-                                                <div className="orders-header">
-                                                    <h3>Your Cart ({cartCount})</h3>
-                                                    <button
-                                                        className="close-btn"
-                                                        onClick={() => setShowOrders(false)}
-                                                    >
-                                                        <FaTimes/>
-                                                    </button>
-                                                </div>
-
-                                                {/* Mensaje de éxito */}
-                                                {showSuccess && (
-                                                    <div className="success-message">
-                                                        {successMessage}
-                                                    </div>
-                                                )}
-
-                                                <div className="orders-list">
-                                                    {loading ? (
-                                                        <div className="loading-orders">
-                                                            <FaSpinner className="spinner-icon"/>
-                                                            <p>Loading your cart...</p>
-                                                        </div>
-                                                    ) : error ? (
-                                                        <div className="error-orders">
-                                                            <p>{error}</p>
-                                                            <button onClick={fetchUserOrders} className="retry-btn">
-                                                                Try Again
-                                                            </button>
-                                                        </div>
-                                                    ) : orders.length === 0 ? (
-                                                        <div className="no-orders">
-                                                            <FaBox className="no-orders-icon"/>
-                                                            <p>Your cart is empty</p>
-                                                            <p className="no-orders-sub">Start shopping to add
-                                                                items!</p>
-                                                        </div>
-                                                    ) : (
-                                                        orders.map(order => (
-                                                            <div key={order.id} className="order-item">
-                                                                <div className="order-item-header">
-                                                                    <span className="order-status" style={{
-                                                                        backgroundColor: getStatusColor(),
-                                                                        color: 'white'
-                                                                    }}>
-                                                                        {getStatusText()}
-                                                                    </span>
-                                                                    <span className="order-price">
-                                                                        ${order.price || '0.00'}
-                                                                    </span>
-                                                                </div>
-
-                                                                <div className="order-item-body">
-                                                                    <div className="order-product">
-                                                                        <FaBox className="order-icon"/>
-                                                                        <span>{order.type}</span>
-                                                                    </div>
-
-                                                                    <div className="order-details">
-                                                                        <div className="order-detail">
-                                                                            <FaCalendarAlt className="detail-icon"/>
-                                                                            <span>{formatDate(order.date)}</span>
-                                                                        </div>
-                                                                        {order.size && order.size !== '-' && (
-                                                                            <div className="order-detail">
-                                                                                <span
-                                                                                    className="order-badge">Size: {order.size}</span>
-                                                                            </div>
-                                                                        )}
-                                                                        {order.color && order.color !== '-' && (
-                                                                            <div className="order-detail">
-                                                                                <span
-                                                                                    className="order-badge">Color: {order.color}</span>
-                                                                            </div>
-                                                                        )}
-                                                                        <div className="order-detail">
-                                                                            <span
-                                                                                className="order-items">Qty: {order.qantity || 1}</span>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {order.specification && order.specification !== '-' && (
-                                                                        <div className="order-specs">
-                                                                            <small>{order.specification}</small>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                <div className="order-item-footer">
-                                                                    <button
-                                                                        className="pay-order-btn"
-                                                                        onClick={() => handlePayOrder(order)}
-                                                                        disabled={deletingOrderId === order.id}
-                                                                    >
-                                                                        <FaCreditCard/> Pay
-                                                                    </button>
-                                                                    <button
-                                                                        className="delete-order-btn"
-                                                                        onClick={() => confirmDeleteOrder(order.id)}
-                                                                        disabled={deletingOrderId === order.id}
-                                                                    >
-                                                                        {deletingOrderId === order.id ? (
-                                                                            <FaSpinner className="spinner-icon-small"/>
-                                                                        ) : (
-                                                                            <>
-                                                                                <FaTrash/> Remove
-                                                                            </>
-                                                                        )}
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        ))
-                                                    )}
-                                                </div>
-
-
-                                            </div>
-                                        )}
                                     </div>
                                 )}
-
 
                                 {!user && (
                                     <div className="auth-buttons">
@@ -355,6 +232,135 @@ const TopBar = () => {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL DEL CARRITO */}
+            {showCartModal && (
+                <div className="cart-modal-overlay" onClick={() => setShowCartModal(false)}>
+                    <div className="cart-modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="cart-modal-header">
+                            <h3>Your Cart ({cartCount})</h3>
+                            <button
+                                className="cart-modal-close"
+                                onClick={() => setShowCartModal(false)}
+                            >
+                                <FaTimes/>
+                            </button>
+                        </div>
+
+                        {/* Mensaje de éxito */}
+                        {showSuccess && (
+                            <div className="cart-modal-success">
+                                {successMessage}
+                            </div>
+                        )}
+
+                        <div className="cart-modal-body">
+                            {loading ? (
+                                <div className="cart-modal-loading">
+                                    <FaSpinner className="spinner-icon"/>
+                                    <p>Loading your cart...</p>
+                                </div>
+                            ) : error ? (
+                                <div className="cart-modal-error">
+                                    <p>{error}</p>
+                                    <button onClick={fetchUserOrders} className="retry-btn">
+                                        Try Again
+                                    </button>
+                                </div>
+                            ) : orders.length === 0 ? (
+                                <div className="cart-modal-empty">
+                                    <FaBox className="empty-icon"/>
+                                    <p>Your cart is empty</p>
+                                    <p className="empty-sub">Start shopping to add items!</p>
+                                    <button
+                                        className="continue-shopping-btn"
+                                        onClick={() => setShowCartModal(false)}
+                                    >
+                                        Continue Shopping
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="cart-modal-items">
+                                    {orders.map(order => (
+                                        <div key={order.id} className="cart-modal-item">
+                                            <div className="cart-item-header">
+                                                <span className="cart-item-status" style={{
+                                                    backgroundColor: getStatusColor(),
+                                                    color: 'white'
+                                                }}>
+                                                    {getStatusText()}
+                                                </span>
+                                                <span className="cart-item-price">
+                                                    ${order.price || '0.00'}
+                                                </span>
+                                            </div>
+
+                                            <div className="cart-item-body">
+                                                <div className="cart-item-product">
+                                                    <FaBox className="item-icon"/>
+                                                    <span>{order.type}</span>
+                                                </div>
+
+                                                <div className="cart-item-details">
+                                                    <div className="cart-item-detail">
+                                                        <FaCalendarAlt className="detail-icon"/>
+                                                        <span>{formatDate(order.date)}</span>
+                                                    </div>
+                                                    {order.size && order.size !== '-' && (
+                                                        <div className="cart-item-detail">
+                                                            <span className="item-badge">Size: {order.size}</span>
+                                                        </div>
+                                                    )}
+                                                    {order.color && order.color !== '-' && (
+                                                        <div className="cart-item-detail">
+                                                            <span className="item-badge">Color: {order.color}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="cart-item-detail">
+                                                        <span className="item-badge">Qty: {order.qantity || 1}</span>
+                                                    </div>
+                                                </div>
+
+                                                {order.specification && order.specification !== '-' && (
+                                                    <div className="cart-item-specs">
+                                                        <small>{order.specification}</small>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="cart-item-footer">
+                                                <button
+                                                    className="cart-item-pay"
+                                                    onClick={() => {
+                                                        setShowCartModal(false);
+                                                        handlePayOrder(order);
+                                                    }}
+                                                    disabled={deletingOrderId === order.id}
+                                                >
+                                                    <FaCreditCard/> Pay
+                                                </button>
+                                                <button
+                                                    className="cart-item-delete"
+                                                    onClick={() => confirmDeleteOrder(order.id)}
+                                                    disabled={deletingOrderId === order.id}
+                                                >
+                                                    {deletingOrderId === order.id ? (
+                                                        <FaSpinner className="spinner-icon-small"/>
+                                                    ) : (
+                                                        <>
+                                                            <FaTrash/> Remove
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Diálogo de confirmación personalizado */}
             {showConfirmDialog && (
@@ -397,6 +403,8 @@ const TopBar = () => {
 
             {/* Estilos CSS adicionales */}
             <style>{`
+                /* Estilos existentes se mantienen igual */
+                ${'' /* Aquí van todos los estilos que ya tenías */}
                 .order-price {
                     font-weight: 600;
                     color: #CD7F32;
@@ -1166,9 +1174,303 @@ const TopBar = () => {
                     .order-item-footer {
                         flex-direction: column;
                     }}
+                /* NUEVOS ESTILOS PARA EL MODAL DEL CARRITO */
+                .cart-modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.7);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 2000;
+                    animation: fadeIn 0.3s ease;
+                }
+
+                .cart-modal-content {
+                    background: linear-gradient(135deg, #1a1f2e, #0f1422);
+                    border-radius: 20px;
+                    width: 90%;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow: hidden;
+                    border: 1px solid rgba(205, 127, 50, 0.3);
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+                    animation: slideUp 0.3s ease;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .cart-modal-header {
+                    background: linear-gradient(135deg, #2a2f3e, #1a1f2e);
+                    padding: 20px 24px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 1px solid rgba(205, 127, 50, 0.2);
+                }
+
+                .cart-modal-header h3 {
+                    margin: 0;
+                    color: #CD7F32;
+                    font-size: 20px;
+                    font-weight: 600;
+                }
+
+                .cart-modal-close {
+                    background: none;
+                    border: none;
+                    color: #fff;
+                    font-size: 20px;
+                    cursor: pointer;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s;
+                }
+
+                .cart-modal-close:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: #CD7F32;
+                }
+
+                .cart-modal-body {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 20px;
+                }
+
+                .cart-modal-body::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .cart-modal-body::-webkit-scrollbar-track {
+                    background: #1a1f2e;
+                }
+
+                .cart-modal-body::-webkit-scrollbar-thumb {
+                    background: #CD7F32;
+                    border-radius: 3px;
+                }
+
+                .cart-modal-success {
+                    background: linear-gradient(135deg, #4caf50, #45a049);
+                    color: white;
+                    padding: 10px 15px;
+                    margin: 0 20px 15px 20px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    text-align: center;
+                    animation: slideDown 0.3s ease;
+                }
+
+                .cart-modal-loading {
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: #CD7F32;
+                }
+
+                .cart-modal-error {
+                    text-align: center;
+                    padding: 30px 20px;
+                    color: #ff6b6b;
+                }
+
+                .cart-modal-empty {
+                    text-align: center;
+                    padding: 40px 20px;
+                    color: #666;
+                }
+
+                .empty-icon {
+                    font-size: 60px;
+                    color: #333;
+                    margin-bottom: 15px;
+                }
+
+                .empty-sub {
+                    font-size: 12px;
+                    color: #888;
+                    margin-top: 5px;
+                    margin-bottom: 20px;
+                }
+
+                .continue-shopping-btn {
+                    background: linear-gradient(135deg, #CD7F32, #DAA520);
+                    border: none;
+                    color: #0a0f1e;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                }
+
+                .continue-shopping-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
+                }
+
+                .cart-modal-items {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                }
+
+                .cart-modal-item {
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(205, 127, 50, 0.1);
+                    border-radius: 12px;
+                    padding: 15px;
+                    transition: all 0.3s;
+                }
+
+                .cart-modal-item:hover {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(205, 127, 50, 0.3);
+                }
+
+                .cart-item-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+
+                .cart-item-status {
+                    padding: 4px 10px;
+                    border-radius: 20px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+
+                .cart-item-price {
+                    font-weight: 600;
+                    color: #CD7F32;
+                    font-size: 14px;
+                }
+
+                .cart-item-body {
+                    margin-bottom: 10px;
+                }
+
+                .cart-item-product {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #fff;
+                    font-size: 14px;
+                    margin-bottom: 8px;
+                }
+
+                .item-icon {
+                    color: #CD7F32;
+                    font-size: 14px;
+                }
+
+                .cart-item-details {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    color: #aaa;
+                    font-size: 12px;
+                    margin-bottom: 5px;
+                }
+
+                .cart-item-detail {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .item-badge {
+                    background: rgba(205, 127, 50, 0.1);
+                    padding: 2px 8px;
+                    border-radius: 12px;
+                    color: #CD7F32;
+                    font-size: 11px;
+                }
+
+                .cart-item-specs {
+                    margin-top: 5px;
+                    padding: 5px;
+                    background: rgba(255, 255, 255, 0.02);
+                    border-radius: 6px;
+                    color: #aaa;
+                    font-size: 11px;
+                    font-style: italic;
+                }
+
+                .cart-item-footer {
+                    display: flex;
+                    gap: 8px;
+                    margin-top: 10px;
+                }
+
+                .cart-item-pay, .cart-item-delete {
+                    flex: 1;
+                    padding: 8px 12px;
+                    border: none;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 5px;
+                    transition: all 0.3s ease;
+                }
+
+                .cart-item-pay {
+                    background: linear-gradient(135deg, #4caf50, #45a049);
+                    color: white;
+                }
+
+                .cart-item-pay:hover:not(:disabled) {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+                }
+
+                .cart-item-delete {
+                    background: rgba(255, 107, 107, 0.1);
+                    border: 1px solid #ff6b6b;
+                    color: #ff6b6b;
+                }
+
+                .cart-item-delete:hover:not(:disabled) {
+                    background: #ff6b6b;
+                    color: white;
+                    transform: translateY(-2px);
+                }
+
+                .cart-item-pay:disabled, .cart-item-delete:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                @media (max-width: 480px) {
+                    .cart-modal-content {
+                        width: 95%;
+                        max-height: 90vh;
+                    }
+
+                    .cart-item-footer {
+                        flex-direction: column;
+                    }
+
+                    .cart-item-details {
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+                }
             `}</style>
-
-
         </>
     );
 };
