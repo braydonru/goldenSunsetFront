@@ -27,7 +27,6 @@ useEffect(() => {
             <Navbar/>
             <Carousel/>
             <ProductRow category={category} />
-            <PreFooter/>
             <DesignsGallery/>
             <Footer/>
         </>

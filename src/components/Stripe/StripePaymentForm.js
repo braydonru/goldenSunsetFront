@@ -66,7 +66,6 @@ const StripePaymentForm = ({order, onSuccess, onClose}) => {
             const responseData = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                // El backend ya debería enviar mensajes amigables
                 throw new Error(responseData.detail || `Error ${response.status}`);
             }
 
@@ -76,7 +75,7 @@ const StripePaymentForm = ({order, onSuccess, onClose}) => {
         } catch (err) {
             console.error('Payment error:', err);
 
-            // Mostrar SOLO el mensaje del error, sin detalles técnicos
+
             let errorMessage = err.message || 'Payment failed';
 
             // Limpiar mensajes técnicos si llegaran

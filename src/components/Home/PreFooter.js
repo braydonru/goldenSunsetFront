@@ -18,6 +18,7 @@ const PreFooter = () => {
                             style={{ maxHeight: '400px', objectFit: 'contain' }}
                         />
                     </div>
+
                     <CardRight/>
                 </div>
             </div>
