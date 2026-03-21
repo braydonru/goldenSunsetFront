@@ -29,6 +29,7 @@ import Designs from "./components/Home/Designs";
 import ListDesigns from "./components/Manage/ListDesign";
 import ListUsers from "./components/Manage/ListUsers";
 import ForCaps from "./components/Designs/ForCaps";
+import OrdersUser from "./components/Home/OrdersUser";
 
 
 const App = () => {
@@ -44,6 +45,12 @@ const App = () => {
             <Route path="alldesigns" element={<Designs/>}/>
             {/* 🔐 PRIVADAS (cualquier usuario logueado) */}
 
+            <Route path="/orders_ready"
+                   element={
+                       <ProtectedRoute>
+                           <OrdersUser/>
+                       </ProtectedRoute>
+                   }/>
             <Route path="/designer/shirt/:id" element={
                 <ProtectedRoute>
                 <ForPullover/>

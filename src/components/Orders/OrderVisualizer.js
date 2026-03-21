@@ -85,7 +85,8 @@ const OrderVisualizer = ({ orden, onClose }) => {
         preview_img_back,
         variation,
         qantity,
-        price
+        price,
+        label_url
     } = orden || {};
 
     const [frontImageLoaded, setFrontImageLoaded] = useState(false);
@@ -276,6 +277,9 @@ const OrderVisualizer = ({ orden, onClose }) => {
                             </div>
                             <div className="detalle-item">
                                 <span>Price:</span> {price}
+                            </div>
+                            <div className="detalle-item">
+                                <span>Label:</span> <a href={label_url} target={'_blank'}>Download Label</a>
                             </div>
 
                             {/* Indicador de diseños disponibles */}

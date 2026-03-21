@@ -34,7 +34,7 @@ const Navbar = () => {
 
                                 <NavLink to="/allreviews" className="nav-item nav-link">Reviews</NavLink>
                                 <NavLink to="/alldesigns" className="nav-item nav-link">Designs</NavLink>
-
+                                <NavLink to="/orders_ready" className="nav-item nav-link">Orders</NavLink>
                                 {/* 👑 SOLO SUPERUSER */}
                                 {user?.superuser && (
 

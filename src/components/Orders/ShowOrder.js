@@ -29,7 +29,7 @@ const ShowOrder = () => {
             }
 
             const data = await response.json();
-console.log(data)
+
             // Mapea los datos según la estructura que espera OrderVisualizer
             const formattedData = {
                 id: data.id || data._id,
@@ -47,6 +47,7 @@ console.log(data)
                 variation: data.variation,
                 qantity: data.qantity,
                 price: data.price,
+                label_url: data.label_url,
             };
 
             setOrden(formattedData);

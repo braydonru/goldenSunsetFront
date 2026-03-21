@@ -1,0 +1,279 @@
+.shipping-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2100;
+    animation: fadeIn 0.3s ease;
+}
+
+.shipping-modal-content {
+    background: linear-gradient(135deg, #1a1f2e, #0f1422);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    border: 1px solid rgba(205, 127, 50, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    animation: slideUp 0.3s ease;
+}
+
+.shipping-modal-header {
+    background: linear-gradient(135deg, #2a2f3e, #1a1f2e);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(205, 127, 50, 0.2);
+}
+
+.shipping-modal-header h3 {
+    margin: 0;
+    color: #CD7F32;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #CD7F32;
+}
+
+.shipping-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(80vh - 80px);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(205, 127, 50, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #CD7F32;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.continue-btn, .confirm-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #CD7F32, #DAA520);
+    border: none;
+    border-radius: 8px;
+    color: #0a0f1e;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.continue-btn:hover, .confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(205, 127, 50, 0.2);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.rates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.rate-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(205, 127, 50, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.rate-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #CD7F32;
+}
+
+.rate-item.selected {
+    border-color: #CD7F32;
+    background: rgba(205, 127, 50, 0.1);
+}
+
+.rate-provider {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rate-provider strong {
+    color: #CD7F32;
+}
+
+.rate-service {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.rate-details {
+    text-align: right;
+}
+
+.rate-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #4caf50;
+    display: block;
+}
+
+.rate-days {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.confirmation-details {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.confirmation-details p {
+    margin: 8px 0;
+    color: #fff;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Agrega esto a ShippingForm.css */
+
+.shipping-message {
+    margin: 15px 20px 0 20px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease;
+}
+
+.shipping-message.error {
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+    color: #ff6b6b;
+}
+
+.shipping-message.success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid #4caf50;
+    color: #4caf50;
+}
+
+.message-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Estilo para campos con error */
+.form-group input.error {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.05);
+}
+
+.form-group input.error:focus {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+/* Mejoras visuales para los placeholders */
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 12px;
+}
+
+/* Animación para los mensajes */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
