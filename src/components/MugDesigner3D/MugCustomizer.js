@@ -20,6 +20,7 @@ export default function MugCustomizer({
     const [showValidation, setShowValidation] = useState(false)
     const totalprice = useDesignerStore(state => state.totalprice)
     const {setTotalprice} = useDesignerStore()
+    const {setWeight} = useDesignerStore()
 
 
 
@@ -64,6 +65,7 @@ export default function MugCustomizer({
                 const data = await response.json();
                 setProduct(data);
                 setBasePrice(data.price || 0);
+                setWeight(data.weight || 0);
 
             } catch (error) {
                 console.error('Error fetching product:', error);

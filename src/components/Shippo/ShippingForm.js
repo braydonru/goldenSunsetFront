@@ -4,17 +4,18 @@ import {FaTruck, FaBox, FaSpinner, FaCheckCircle, FaExclamationTriangle} from 'r
 import {ENV} from '../../conf/env';
 import './ShippingForm.css';
 
-// Dimensiones de paquete estándar (puedes modificar según el producto)
-const DEFAULT_PARCEL = {
-    length: 10,
-    width: 8,
-    height: 2,
-    weight: 1,
-    distance_unit: 'in',
-    mass_unit: 'lb'
-};
+
 
 const ShippingForm = ({order, onShippingSelected, onClose}) => {
+    // Dimensiones de paquete estándar (puedes modificar según el producto)
+    const DEFAULT_PARCEL = {
+        length: 10,
+        width: 8,
+        height: 2,
+        weight: order.total_weight,
+        distance_unit: 'in',
+        mass_unit: 'lb'
+    };
     const [address, setAddress] = useState({
         name: '',
         street1: '',

@@ -18,6 +18,7 @@ export default function MugForThermo() {
     const quantity = useDesignerStore(state => state.quantity);
     const totalprice = useDesignerStore(state => state.totalprice);
     const { user } = useAuthStore();
+    const weight = useDesignerStore(state => state.weight);
 
     const handleImageUpload = (objectUrl, file) => {
         setTextureUrl(objectUrl);
@@ -47,6 +48,7 @@ export default function MugForThermo() {
             formData.append('preview_img', file);
             formData.append("qantity", quantity.toString())
             formData.append("price", totalprice)
+            formData.append('total_weight', weight * quantity)
 
             const res = await fetch(`${ENV.API_URL}/order/create`, {
                 method: 'POST',

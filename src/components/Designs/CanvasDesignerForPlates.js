@@ -72,6 +72,7 @@ export default function DesignerCanvas() {
     const [product, setProduct] = useState(null);
     const [basePrice, setBasePrice] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [weight, setWeight] = useState(0);
     const [validationError, setValidationError] = useState("")
     const [showValidation, setShowValidation] = useState(false)
 
@@ -91,7 +92,7 @@ export default function DesignerCanvas() {
                 const data = await response.json();
                 setProduct(data);
                 setBasePrice(data.price || 0);
-
+                setWeight(data.weight);
             } catch (error) {
                 console.error('Error fetching product:', error);
                 setValidationError('Could not load product details');
@@ -406,6 +407,7 @@ export default function DesignerCanvas() {
             if (specification) formData.append('specification', specification)
             if (uploadedImage) formData.append('client_img', uploadedImage, `design_${Date.now()}.png`)
             formData.append('preview_img', previewBlob, `preview_${Date.now()}.png`)
+            formData.append('total_weight', weight * currentQuantity)
 
             const headers = {}
             if (access_token) headers['Authorization'] = `Bearer ${access_token}`

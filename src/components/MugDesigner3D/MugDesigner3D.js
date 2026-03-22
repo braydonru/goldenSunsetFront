@@ -18,6 +18,7 @@ export default function MugEditor() {
     const quantity = useDesignerStore(state => state.quantity);
     const totalprice = useDesignerStore(state => state.totalprice);
     const { user } = useAuthStore();
+    const weight = useDesignerStore(state => state.weight);
 
 
     const handleImageUpload = (objectUrl, file) => {
@@ -51,6 +52,7 @@ export default function MugEditor() {
             formData.append("variation", selectedVariant?.name || 'Standard')
             formData.append("qantity", quantity.toString())
             formData.append("price", totalprice)
+            formData.append('total_weight', weight * quantity)
 
 
             const res = await fetch(`${ENV.API_URL}/order/create`, {

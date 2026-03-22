@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDesignerStore} from "../Designs/designer.store";
 import {ENV} from "../../conf/env";
+import {useAuthStore} from "../../store/auth.store";
 
 export default function CustomizerForThermo({
                                           onImageUpload,   // recibe File
@@ -17,8 +18,10 @@ export default function CustomizerForThermo({
     const [productLoading, setProductLoading] = useState(true);
     const [validationError, setValidationError] = useState("")
     const [showValidation, setShowValidation] = useState(false)
+    const [baseWeight, setBaseWeight] = useState(0)
     const totalprice = useDesignerStore(state => state.totalprice)
     const {setTotalprice} = useDesignerStore()
+    const {setWeight} = useDesignerStore()
 
     const processFile = (file) => {
         if (!file) return;
@@ -60,6 +63,7 @@ export default function CustomizerForThermo({
                 const data = await response.json();
                 setProduct(data);
                 setBasePrice(data.price || 0);
+                setWeight(data.weight || 0);
 
             } catch (error) {
                 console.error('Error fetching product:', error);

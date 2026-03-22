@@ -8,6 +8,7 @@ export const useDesignerStore = create((set) => ({
     selectedVariant: null,
     quantity: 1,
     totalprice: 0,
+    weight: 0,
 
     setSize: (size) => set({ size }),
     setColor: (color) => set({ selectedColor: color }),
@@ -16,6 +17,7 @@ export const useDesignerStore = create((set) => ({
     setSelectedVariant: (variant) => set({ selectedVariant: variant }),
     setQuantity: (quantity) => set({quantity}),
     setTotalprice: (totalprice) => set({totalprice}),
+    setWeight: (weight) => set({weight}),
 
     resetDesignerState: () => set({
         size: null,
@@ -25,5 +27,6 @@ export const useDesignerStore = create((set) => ({
         selectedVariant: null,
         quantity: null,
         totalprice: 0,
+        weight: 0,
     }),
 }))

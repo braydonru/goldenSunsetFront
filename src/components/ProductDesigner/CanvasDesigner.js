@@ -29,6 +29,7 @@ export default function DesignerCanvas() {
     const [productLoading, setProductLoading] = useState(true);
     const [basePrice, setBasePrice] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [weight, setWeight] = useState(0);
 
     const [activeSide, setActiveSide] = useState("front")
     const [currentText, setCurrentText] = useState("")
@@ -97,6 +98,7 @@ export default function DesignerCanvas() {
                 const data = await response.json();
                 setProduct(data);
                 setBasePrice(data.price || 0);
+                setWeight(data.weight || 0);
 
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -572,7 +574,7 @@ export default function DesignerCanvas() {
             return
         }
 
-        if (currentQuantity == 0) {
+        if (currentQuantity === 0) {
             setValidationError("Please select a quantity first")
             setShowValidation(true)
             return
@@ -601,7 +603,9 @@ export default function DesignerCanvas() {
             formData.append("variation", selectedVariant.name)
             formData.append("qantity", currentQuantity.toString())
             formData.append("price", totalPrice)
+            formData.append('total_weight', weight * currentQuantity)
 
+            console.log(formData)
             // Guardar el lado actual para restaurarlo después
             const currentSide = activeSide
 

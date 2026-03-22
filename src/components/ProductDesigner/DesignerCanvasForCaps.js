@@ -29,6 +29,7 @@ export default function DesignerCanvasForCaps() {
     const [product, setProduct] = useState(null);
     const [productLoading, setProductLoading] = useState(true);
     const [basePrice, setBasePrice] = useState(0);
+    const [weight, setWeight] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
     const [currentText, setCurrentText] = useState("")
     const [textSize, setTextSize] = useState(28)
@@ -69,7 +70,7 @@ export default function DesignerCanvasForCaps() {
         }
     }
 
-    console.log(selectedVariant)
+
     const getCurrentState = () => capState.current
 
     // ================= OBTENER PRODUCTO =================
@@ -88,6 +89,7 @@ export default function DesignerCanvasForCaps() {
                 const data = await response.json();
                 setProduct(data);
                 setBasePrice(data.price || 0);
+                setWeight(data.weight)
 
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -554,6 +556,7 @@ export default function DesignerCanvasForCaps() {
             formData.append("variation", selectedVariant?.name || "Cap")
             formData.append("qantity", currentQuantity)
             formData.append("price", totalPrice)
+            formData.append("total_weight", weight * currentQuantity)
 
             // Generar preview
             const preview = await generatePreviewImage()

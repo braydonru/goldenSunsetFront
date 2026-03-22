@@ -1,4 +1,3 @@
-// ProductModal.jsx
 import React, { useState, useEffect } from 'react';
 import './ProductModal.css';
 import { get_categories_all } from '../../hooks/get_category';
@@ -7,9 +6,10 @@ const ProductModal = ({ onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        price: '',
+        price: 1,
         category: '',
-        img_url: null
+        img_url: null,
+        weight: 0.0
     });
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -55,6 +55,10 @@ const ProductModal = ({ onClose, onSubmit }) => {
             newErrors.img_url = 'Product image is required';
         }
 
+        if (!formData.weight) {
+            newErrors.weight = 'Product weight is required';
+        }
+
         return newErrors;
     };
 
@@ -90,6 +94,7 @@ const ProductModal = ({ onClose, onSubmit }) => {
         submitData.append('price', formData.price);
         submitData.append('category', formData.category);
         submitData.append('img_url', formData.img_url);
+        submitData.append('weight', formData.weight);
 
         await onSubmit(submitData);
         setLoading(false);
@@ -117,6 +122,7 @@ const ProductModal = ({ onClose, onSubmit }) => {
                                 Product Name <span className="required">*</span>
                             </label>
                             <input
+                                style={{color: 'black'}}
                                 type="text"
                                 id="nombre"
                                 value={formData.nombre}
@@ -137,6 +143,7 @@ const ProductModal = ({ onClose, onSubmit }) => {
                                 Price <span className="required">*</span>
                             </label>
                             <input
+                                style={{color: 'black'}}
                                 type="number"
                                 id="price"
                                 step="0.01"
@@ -199,6 +206,29 @@ const ProductModal = ({ onClose, onSubmit }) => {
                             </select>
                             {errors.category && (
                                 <span className="error-message">{errors.category}</span>
+                            )}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="weight">
+                                WEIGHT <span className="required">*</span>
+                            </label>
+                            <input
+                                style={{color: 'black'}}
+                                type="number"
+                                id="weight"
+                                step="0.01"
+                                min="0"
+                                value={formData.weight}
+                                onChange={(e) => {
+                                    setFormData({...formData, weight: e.target.value});
+                                    setErrors({...errors, weight: null});
+                                }}
+                                className={errors.weight ? 'error' : ''}
+                                disabled={loading}
+                            />
+                            {errors.weight && (
+                                <span className="error-message">{errors.weight}</span>
                             )}
                         </div>
 
