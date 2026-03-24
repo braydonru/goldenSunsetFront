@@ -3,19 +3,25 @@ import React, {useState} from 'react';
 import {FaTruck, FaBox, FaSpinner, FaCheckCircle, FaExclamationTriangle} from 'react-icons/fa';
 import {ENV} from '../../conf/env';
 import './ShippingForm.css';
-
+import {dimentioner} from './dimentioner';
 
 
 const ShippingForm = ({order, onShippingSelected, onClose}) => {
+
+
     // Dimensiones de paquete estándar (puedes modificar según el producto)
     const DEFAULT_PARCEL = {
-        length: 10,
-        width: 8,
-        height: 2,
+        length: dimentioner(order).length,
+        width: dimentioner(order).width,
+        height: dimentioner(order).height,
         weight: order.total_weight,
         distance_unit: 'in',
         mass_unit: 'lb'
     };
+
+    console.log(DEFAULT_PARCEL)
+
+
     const [address, setAddress] = useState({
         name: '',
         street1: '',
