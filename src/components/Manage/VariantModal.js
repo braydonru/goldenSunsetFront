@@ -132,6 +132,7 @@ const VariantModal = ({ onClose, onSubmit }) => {
                             placeholder="e.g., Manga Larga, Taza Grande, etc."
                             className={errors.name ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         />
                         {errors.name && (
                             <span className="error-message">{errors.name}</span>
@@ -151,6 +152,7 @@ const VariantModal = ({ onClose, onSubmit }) => {
                             }}
                             className={errors.category_id ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         >
                             <option value="">Select a category</option>
                             {categories.map(cat => (
@@ -175,6 +177,7 @@ const VariantModal = ({ onClose, onSubmit }) => {
                             onChange={handleImageChange}
                             className={errors.image_url ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         />
                         {errors.image_url && (
                             <span className="error-message">{errors.image_url}</span>

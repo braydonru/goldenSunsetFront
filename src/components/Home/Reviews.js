@@ -229,10 +229,10 @@ const Reviews = () => {
 
                 {/* Mensajes de error */}
                 {errors.comment && (
-                    <div className="field-error">{errors.comment}</div>
+                    <div className="field-error">You must leave a comment.</div>
                 )}
                 {errors.image && (
-                    <div className="field-error">{errors.image}</div>
+                    <div className="field-error">You must include an image.</div>
                 )}
 
                 {/* Botón de envío */}
@@ -246,7 +246,7 @@ const Reviews = () => {
             </form>
 
             {errors.submit && (
-                <div className="footer-error">{errors.submit}</div>
+                <div className="footer-error">Fill all fields</div>
             )}
         </div>
     );

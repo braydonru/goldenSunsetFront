@@ -10,7 +10,7 @@ export const dimentioner = (order) => {
         DEFAULT_PARCEL.length = 12;
         DEFAULT_PARCEL.width = 5;
         DEFAULT_PARCEL.height = 1;
-    } else if (order.type === 'Pullover' && (order.qantity >= 6 && order.qantity < 10)) {
+    } else if (order.type === 'Pullover' && (order.qantity >= 6 && order.qantity <= 10)) {
         DEFAULT_PARCEL.length = 12;
         DEFAULT_PARCEL.width = 9;
         DEFAULT_PARCEL.height = 6;

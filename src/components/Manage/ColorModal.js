@@ -142,6 +142,7 @@ const ColorModal = ({ onClose, onSubmit }) => {
                             placeholder="e.g., White"
                             className={errors.color_name ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         />
                         {errors.color_name && (
                             <span className="error-message">{errors.color_name}</span>
@@ -160,6 +161,7 @@ const ColorModal = ({ onClose, onSubmit }) => {
                                 value={formData.color_code}
                                 onChange={(e) => setFormData({...formData, color_code: e.target.value})}
                                 disabled={loading}
+                                style={{color: 'black'}}
                             />
                             <input
                                 type="text"
@@ -168,6 +170,7 @@ const ColorModal = ({ onClose, onSubmit }) => {
                                 placeholder="#000000"
                                 pattern="^#[0-9A-Fa-f]{6}$"
                                 disabled={loading}
+                                style={{color: 'black'}}
                             />
                         </div>
                     </div>
@@ -181,6 +184,7 @@ const ColorModal = ({ onClose, onSubmit }) => {
                             }}
                             className={errors.variant ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         >
                             <option value="">Select a variant</option>
                             {variant.map(varian => (
@@ -202,6 +206,7 @@ const ColorModal = ({ onClose, onSubmit }) => {
                                 onChange={(e) => handleImageChange(e, 'front_image')}
                                 className={errors.front_image ? 'error' : ''}
                                 disabled={loading}
+                                style={{color: 'black'}}
                             />
                             {errors.front_image && (
                                 <span className="error-message">{errors.front_image}</span>
@@ -225,6 +230,7 @@ const ColorModal = ({ onClose, onSubmit }) => {
                                 onChange={(e) => handleImageChange(e, 'back_image')}
                                 className={errors.back_image ? 'error' : ''}
                                 disabled={loading}
+                                style={{color: 'black'}}
                             />
                             {errors.back_image && (
                                 <span className="error-message">{errors.back_image}</span>

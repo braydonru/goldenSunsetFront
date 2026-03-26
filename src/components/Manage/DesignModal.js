@@ -118,6 +118,7 @@ const DesignModal = ({ onClose, onSubmit }) => {
                             placeholder="e.g., Floral Pattern, Geometric Design"
                             className={errors.name ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         />
                         {errors.name && (
                             <span className="error-message">{errors.name}</span>
@@ -160,6 +161,7 @@ const DesignModal = ({ onClose, onSubmit }) => {
                             onChange={handleImageChange}
                             className={errors.image ? 'error' : ''}
                             disabled={loading}
+                            style={{color: 'black'}}
                         />
                         {errors.image && (
                             <span className="error-message">{errors.image}</span>

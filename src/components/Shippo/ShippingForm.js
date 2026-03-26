@@ -19,8 +19,6 @@ const ShippingForm = ({order, onShippingSelected, onClose}) => {
         mass_unit: 'lb'
     };
 
-    console.log(DEFAULT_PARCEL)
-
 
     const [address, setAddress] = useState({
         name: '',

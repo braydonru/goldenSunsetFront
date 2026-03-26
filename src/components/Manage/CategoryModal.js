@@ -74,6 +74,7 @@ const CategoryModal = ({ onClose, onSubmit }) => {
                             className={errors.name ? 'error' : ''}
                             disabled={loading}
                             autoFocus
+                            style={{color: 'black'}}
                         />
                         {errors.name && (
                             <span className="error-message">{errors.name}</span>
