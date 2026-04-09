@@ -98,6 +98,7 @@ const CategoryForm = () => {
                                         onChange={handleChange}
                                         placeholder="Enter Category"
                                         required
+
                                     />
                                 </div>
 
