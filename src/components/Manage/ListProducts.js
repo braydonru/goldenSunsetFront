@@ -4,7 +4,13 @@ import Navbar from "../Home/Navbar";
 import Footer from "../Home/Footer";
 import SimpleToast from '../Orders/ToastSimple';
 import ProductModal from './ProductModal';
-import { get_products_all, deleteProduct, activateProduct, createProduct } from "../../hooks/get_products";
+import {
+    get_products_all,
+    deleteProduct,
+    activateProduct,
+    createProduct,
+    hardDeleteProduct
+} from "../../hooks/get_products";
 import './tablestyle.css';
 
 const ListProducts = () => {
@@ -12,6 +18,7 @@ const ListProducts = () => {
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     const fetchProducts = async () => {
@@ -77,12 +84,38 @@ const ListProducts = () => {
         }
     };
 
+    // 👇 NUEVO: Eliminar producto (borrado lógico: enable=false)
+    const handleDeleteProduct = async (product) => {
+        if (!window.confirm(`⚠️ Are you sure you want to PERMANENTLY delete "${product.nombre}"?\n\nThis action cannot be undone.`)) return;
+
+        setDeletingId(product.id);
+
+        try {
+            const result = await hardDeleteProduct(product.id);
+
+            if (result?.success) {
+                // Eliminar físicamente de la lista local
+                setProducts(products.filter(p => p.id !== product.id));
+                setToast({
+                    message: `✅ Product "${product.nombre}" permanently deleted`,
+                    type: 'success'
+                });
+            } else {
+                setToast({message: result?.error || 'Deletion failed', type: 'error'});
+            }
+        } catch (err) {
+            setToast({message: 'Error deleting product', type: 'error'});
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     const handleCreateProduct = async (formData) => {
         try {
             const result = await createProduct(formData);
 
             if (result?.success) {
-                await fetchProducts(); // Recargar productos
+                await fetchProducts();
                 setToast({
                     message: 'Product created successfully',
                     type: 'success'
@@ -158,23 +191,32 @@ const ListProducts = () => {
                                         </span>
                                 </td>
                                 <td>
-                                    {product.enable ? (
+                                    <div className="action-buttons">
+                                        {product.enable ? (
+                                            <button
+                                                className="deactivate-btn"
+                                                onClick={() => handleDeactivate(product)}
+                                                disabled={updatingId === product.id}
+                                            >
+                                                {updatingId === product.id ? '...' : 'Deactivate'}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="activate-btn"
+                                                onClick={() => handleActivate(product)}
+                                                disabled={updatingId === product.id}
+                                            >
+                                                {updatingId === product.id ? '...' : 'Activate'}
+                                            </button>
+                                        )}
                                         <button
-                                            className="deactivate-btn"
-                                            onClick={() => handleDeactivate(product)}
-                                            disabled={updatingId === product.id}
+                                            className="delete-btn"
+                                            onClick={() => handleDeleteProduct(product)}
+                                            disabled={deletingId === product.id}
                                         >
-                                            {updatingId === product.id ? '...' : 'Deactivate'}
+                                            {deletingId === product.id ? '...' : 'Delete'}
                                         </button>
-                                    ) : (
-                                        <button
-                                            className="activate-btn"
-                                            onClick={() => handleActivate(product)}
-                                            disabled={updatingId === product.id}
-                                        >
-                                            {updatingId === product.id ? '...' : 'Activate'}
-                                        </button>
-                                    )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -184,7 +226,6 @@ const ListProducts = () => {
             </div>
             <Footer/>
 
-            {/* Modal para crear producto */}
             {showModal && (
                 <ProductModal
                     onClose={() => setShowModal(false)}
@@ -192,7 +233,6 @@ const ListProducts = () => {
                 />
             )}
 
-            {/* Toast notifications */}
             {toast && (
                 <SimpleToast
                     message={toast.message}

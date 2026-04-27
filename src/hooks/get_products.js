@@ -153,3 +153,31 @@ export const createProduct = async (formData) => {
         };
     }
 };
+
+// hooks/get_products.js
+export const hardDeleteProduct = async (id) => {
+    try {
+        const response = await fetch(`${ENV.API_URL}/product/hard_delete/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            return {
+                success: false,
+                error: errorData?.detail || `Error ${response.status}`
+            };
+        }
+
+        return {success: true, message: 'Product deleted successfully'};
+    } catch (error) {
+        return {
+            success: false,
+            error: error.message || 'Error deleting product'
+        };
+    }
+};
