@@ -5,7 +5,7 @@ const ProductResolver = ({ product, children }) => {
 
     const handleClick = () => {
         switch (product.type) {
-            case 'Pullovers':
+            case 'T-Shirt':
                 navigate(`/designer/shirt/${product.id}`);
                 break;
             case 'Mugs':
