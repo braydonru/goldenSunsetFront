@@ -16,6 +16,7 @@ const ListVariants = () => {
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     const fetchVariants = async () => {
@@ -67,6 +68,7 @@ const ListVariants = () => {
         }
     };
 
+
     const handleEnable = async (variant) => {
         setUpdatingId(variant.id);
 
@@ -88,6 +90,42 @@ const ListVariants = () => {
             setToast({ message: 'Error activating variant', type: 'error' });
         } finally {
             setUpdatingId(null);
+        }
+    };
+
+    // 👇 NUEVO: Eliminar variante (borrado físico)
+    const handleDeleteVariant = async (variant) => {
+        if (!window.confirm(`⚠️ Are you sure you want to PERMANENTLY delete "${variant.name}"?\n\nThis action cannot be undone.`)) return;
+
+        setDeletingId(variant.id);
+
+        try {
+            // Llamar al endpoint de eliminación
+            const response = await fetch(`${ENV.API_URL}/product_variant/delete/${variant.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.detail || `Error ${response.status}: Deletion failed`);
+            }
+
+            // Actualizar la lista local eliminando la variante
+            setVariants(variants.filter(v => v.id !== variant.id));
+            setToast({
+                message: `✅ Variant "${variant.name}" permanently deleted`,
+                type: 'success'
+            });
+
+        } catch (err) {
+            console.error('Error deleting variant:', err);
+            setToast({message: err.message || 'Error deleting variant', type: 'error'});
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -171,7 +209,6 @@ const ListVariants = () => {
                             <tr key={variant.id}>
                                 <td>{variant.id}</td>
                                 <td>
-
                                     <img
                                         src={`${ENV.API_URL}/${variant.image_url}`}
                                         alt={variant.name}
@@ -211,6 +248,13 @@ const ListVariants = () => {
                                                 {updatingId === variant.id ? '...' : 'Activate'}
                                             </button>
                                         )}
+                                        <button
+                                            className="delete-btn"
+                                            onClick={() => handleDeleteVariant(variant)}
+                                            disabled={deletingId === variant.id}
+                                        >
+                                            {deletingId === variant.id ? '...' : 'Delete'}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

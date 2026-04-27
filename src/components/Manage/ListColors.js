@@ -6,12 +6,14 @@ import SimpleToast from '../Orders/ToastSimple'; // Verifica esta ruta
 import { get_colors_all, enableColor, disableColor, createColor } from "../../hooks/get_colors";
 import ColorModal from './ColorModal'; // Asegúrate que este archivo existe
 import './colorstyle.css';
+import {ENV} from "../../conf/env";
 
 const ListColors = () => {
     const [colors, setColors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
@@ -74,6 +76,40 @@ const ListColors = () => {
             setToast({ message: 'Error activating color', type: 'error' });
         } finally {
             setUpdatingId(null);
+        }
+    };
+
+    // 👇 NUEVO: Eliminar color (borrado físico)
+    const handleDeleteColor = async (color) => {
+        if (!window.confirm(`⚠️ Are you sure you want to PERMANENTLY delete "${color.color_name}"?\n\nThis action cannot be undone.`)) return;
+        setDeletingId(color.id);
+
+        try {
+            const response = await fetch(`${ENV.API_URL}/colors/delete/${color.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.detail || `Error ${response.status}: Deletion failed`);
+            }
+
+            // Actualizar la lista local eliminando el color
+            setColors(colors.filter(c => c.id !== color.id));
+            setToast({
+                message: `✅ Color "${color.color_name}" permanently deleted`,
+                type: 'success'
+            });
+
+        } catch (err) {
+            console.error('Error deleting color:', err);
+            setToast({message: err.message || 'Error deleting color', type: 'error'});
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -212,6 +248,13 @@ const ListColors = () => {
                                                 {updatingId === color.id ? '...' : 'Activate'}
                                             </button>
                                         )}
+                                        <button
+                                            className="delete-btn"
+                                            onClick={() => handleDeleteColor(color)}
+                                            disabled={deletingId === color.id}
+                                        >
+                                            {deletingId === color.id ? '...' : 'Delete'}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

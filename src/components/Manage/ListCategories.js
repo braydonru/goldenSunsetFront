@@ -7,12 +7,14 @@ import SimpleToast from '../Orders/ToastSimple';
 import CategoryModal from './CategoryModal';
 import { get_categories_all, enableCategory, disableCategory, createCategory } from "../../hooks/get_category";
 import './categorystyle.css';
+import {ENV} from '../../conf/env';
 
 const ListCategories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     const fetchCategories = async () => {
@@ -75,6 +77,41 @@ const ListCategories = () => {
             setToast({ message: 'Error activating category', type: 'error' });
         } finally {
             setUpdatingId(null);
+        }
+    };
+
+    // 👇 NUEVO: Eliminar categoría (borrado físico)
+    const handleDeleteCategory = async (category) => {
+        if (!window.confirm(`⚠️ Are you sure you want to PERMANENTLY delete "${category.name}"?\n\nThis action cannot be undone.`)) return;
+
+        setDeletingId(category.id);
+
+        try {
+            const response = await fetch(`${ENV.API_URL}/category/delete/${category.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.detail || `Error ${response.status}: Deletion failed`);
+            }
+
+            // Actualizar la lista local eliminando la categoría
+            setCategories(categories.filter(c => c.id !== category.id));
+            setToast({
+                message: `✅ Category "${category.name}" permanently deleted`,
+                type: 'success'
+            });
+
+        } catch (err) {
+            console.error('Error deleting category:', err);
+            setToast({message: err.message || 'Error deleting category', type: 'error'});
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -157,23 +194,32 @@ const ListCategories = () => {
                                         </span>
                                 </td>
                                 <td>
-                                    {category.enable ? (
+                                    <div className="action-buttons">
+                                        {category.enable ? (
+                                            <button
+                                                className="deactivate-btn"
+                                                onClick={() => handleDisable(category)}
+                                                disabled={updatingId === category.id}
+                                            >
+                                                {updatingId === category.id ? '...' : 'Deactivate'}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="activate-btn"
+                                                onClick={() => handleEnable(category)}
+                                                disabled={updatingId === category.id}
+                                            >
+                                                {updatingId === category.id ? '...' : 'Activate'}
+                                            </button>
+                                        )}
                                         <button
-                                            className="deactivate-btn"
-                                            onClick={() => handleDisable(category)}
-                                            disabled={updatingId === category.id}
+                                            className="delete-btn"
+                                            onClick={() => handleDeleteCategory(category)}
+                                            disabled={deletingId === category.id}
                                         >
-                                            {updatingId === category.id ? '...' : 'Deactivate'}
+                                            {deletingId === category.id ? '...' : 'Delete'}
                                         </button>
-                                    ) : (
-                                        <button
-                                            className="activate-btn"
-                                            onClick={() => handleEnable(category)}
-                                            disabled={updatingId === category.id}
-                                        >
-                                            {updatingId === category.id ? '...' : 'Activate'}
-                                        </button>
-                                    )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
