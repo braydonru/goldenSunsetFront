@@ -7,8 +7,7 @@ const ProductCard = ({product}) => {
     const { nombre, price, img_url, descripcion, enable } = product;
 
     // URL de placeholder por si la imagen falla
-    const placeholderImage = '/img/placeholder.jpg'; // Ajusta la ruta según tu proyecto
-
+    const placeholderImage = '/img/placeholder.jpg';
     return (
         <div className="cat-item d-flex flex-column border mb-4 product-card">
             <p className="price-tag">{price}$</p>

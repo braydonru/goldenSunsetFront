@@ -9,7 +9,6 @@ const VariantSelector = ({ category }) => {
     const [loading, setLoading] = useState(false);
     const [expanded, setExpanded] = useState(false);
 
-    // 👇 CORRECCIÓN: Así se obtiene la función del store
     const setVariant = useDesignerStore(state => state.setSelectedVariant);
     const selectedVariant = useDesignerStore(state => state.selectedVariant);
 
