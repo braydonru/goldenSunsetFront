@@ -728,7 +728,7 @@ export default function DesignerCanvas() {
         }}>
 
             <h2 style={{ textAlign: "center", marginBottom: 20, color: "#333" }}>
-                🎨 Design Your {product?.name || 'Pullover'}
+                🎨 Design Your {product?.name || 'T-Shirt'}
             </h2>
 
             {selectedColor && (
