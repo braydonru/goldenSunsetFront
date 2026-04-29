@@ -8,7 +8,6 @@ export default function DesignerCanvas() {
     const resetDesignerState = useDesignerStore(s => s.resetDesignerState);
 
     useEffect(() => {
-        // Resetear el estado al montar el componente
         resetDesignerState();
     }, [resetDesignerState]);
 
@@ -17,9 +16,10 @@ export default function DesignerCanvas() {
     const size = useDesignerStore(s => s.size)
     const font = useDesignerStore(s => s.font)
     const selectedColor = useDesignerStore(s => s.selectedColor)
-    const setSelectedColor = useDesignerStore(s => s.setSelectedColor)
+    const setSelectedColor = useDesignerStore(s => s.selectedColor)
     const specification = useDesignerStore(s => s.specification)
     const selectedVariant = useDesignerStore(state => state.selectedVariant);
+
 
     const canvasRef = useRef(null)
     const shirtImgRef = useRef(null)
@@ -97,7 +97,6 @@ export default function DesignerCanvas() {
 
                 const data = await response.json();
                 setProduct(data);
-                setBasePrice(data.price || 0);
                 setWeight(data.weight || 0);
 
             } catch (error) {
@@ -114,14 +113,16 @@ export default function DesignerCanvas() {
         }
     }, [id]);
 
+
     // ================= CALCULAR PRECIO TOTAL =================
     useEffect(() => {
-        let price = basePrice;
 
-        // Aplicar multiplicador por cantidad
+        if (!selectedVariant) return;
 
 
-        // Aplicar costo adicional por doble cara
+        let price = selectedVariant.price || 0;
+
+
         if (isDoubleSided()) {
             price += 2.00;
         }
@@ -132,10 +133,11 @@ export default function DesignerCanvas() {
             price += 7;
         }
 
+
         price *= currentQuantity;
 
         setTotalPrice(price);
-    }, [basePrice, currentQuantity, isDoubleSided]);
+    }, [selectedVariant, currentQuantity, isDoubleSided, size]);
 
     // Cargar colores disponibles y seleccionar el primero por defecto
     useEffect(() => {
@@ -153,7 +155,7 @@ export default function DesignerCanvas() {
 
                 // Si hay colores y no hay uno seleccionado, seleccionar el primero
                 if (colorsArray.length > 0 && !selectedColor) {
-                    setSelectedColor(colorsArray[0])
+                    selectedColor(colorsArray[0])
                 }
             } catch (error) {
                 console.error("Error fetching colors:", error)
@@ -667,11 +669,11 @@ export default function DesignerCanvas() {
 
             const responseData = await res.json()
 
-            // Mostrar mensaje de éxito elegante
+
             setSuccessMessage("✅ Order created successfully")
             setShowSuccess(true)
 
-            // Ocultar después de 3 segundos
+
             setTimeout(() => {
                 setShowSuccess(false)
                 setSuccessMessage("")

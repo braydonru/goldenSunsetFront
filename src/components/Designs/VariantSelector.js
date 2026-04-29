@@ -8,9 +8,9 @@ const VariantSelector = ({ category }) => {
     const [variants, setVariants] = useState([]);
     const [loading, setLoading] = useState(false);
     const [expanded, setExpanded] = useState(false);
-
     const setVariant = useDesignerStore(state => state.setSelectedVariant);
     const selectedVariant = useDesignerStore(state => state.selectedVariant);
+
 
     useEffect(() => {
         if (category) {
@@ -23,19 +23,20 @@ const VariantSelector = ({ category }) => {
             setLoading(true);
             const response = await get_variants_by_category(category);
             setVariants(Array.isArray(response) ? response : []);
+            setVariant(response[0]);
         } catch (error) {
-
+            console.error("Error fetching variants:", error);
         } finally {
             setLoading(false);
         }
+
     };
 
     const handleSelectVariant = (variant) => {
-        // 👇 Guardar en el store
         setVariant(variant);
     };
 
-    // Mostrar solo 4 variantes inicialmente, o todas si expanded es true
+
     const displayedVariants = expanded ? variants : variants.slice(0, 4);
 
     if (!category) {
@@ -99,9 +100,7 @@ const VariantSelector = ({ category }) => {
                                             e.target.src = '/img/placeholder.jpg';
                                         }}
                                     />
-                                    <div className="ms-3">
-                                        <h6 className="mb-1">{selectedVariant.name}</h6>
-                                    </div>
+
                                 </div>
                             </div>
                         )}
@@ -129,7 +128,16 @@ const VariantSelector = ({ category }) => {
                                             </div>
                                         )}
                                     </div>
-                                    <span className="variant-name">{variant.name}</span>
+                                    <div className="variant-info">
+                                        <span className="variant-name">{variant.name}</span>
+                                        {variant.price && (
+                                            <span className="variant-price-small">
+                                                ${typeof variant.price === 'number'
+                                                ? variant.price.toFixed(2)
+                                                : variant.price}
+                                            </span>
+                                        )}
+                                    </div>
                                 </button>
                             ))}
                         </div>

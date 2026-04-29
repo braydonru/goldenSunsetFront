@@ -8,7 +8,8 @@ const VariantModal = ({ onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         name: '',
         category_id: '',
-        image_url: null
+        image_url: null,
+        price: 0.0,
     });
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -44,13 +45,17 @@ const VariantModal = ({ onClose, onSubmit }) => {
             newErrors.image_url = 'Variant image is required';
         }
 
+        if (!formData.price) {
+            newErrors.price = 'Variant price is required';
+        }
+
         return newErrors;
     };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validar tipo de archivo
+
             if (!file.type.startsWith('image/')) {
                 setErrors({...errors, image_url: 'File must be an image'});
                 return;
@@ -91,6 +96,7 @@ const VariantModal = ({ onClose, onSubmit }) => {
             submitData.append('name', formData.name);
             submitData.append('category_id', formData.category_id);
             submitData.append('image_url', formData.image_url);
+            submitData.append('price', formData.price);
 
             await onSubmit(submitData);
 
@@ -136,6 +142,28 @@ const VariantModal = ({ onClose, onSubmit }) => {
                         />
                         {errors.name && (
                             <span className="error-message">{errors.name}</span>
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="name">
+                            Price <span className="required">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            id="price"
+                            value={formData.price}
+                            onChange={(e) => {
+                                setFormData({...formData, price: e.target.value});
+                                setErrors({...errors, price: null});
+                            }}
+                            placeholder="0"
+                            className={errors.price ? 'error' : ''}
+                            disabled={loading}
+                            style={{color: 'black'}}
+                        />
+                        {errors.price && (
+                            <span className="error-message">{errors.price}</span>
                         )}
                     </div>
 

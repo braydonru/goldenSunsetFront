@@ -4,14 +4,12 @@ import { ENV } from '../../conf/env';
 import './ProductCard.css'; // Crearemos este archivo
 
 const ProductCard = ({product}) => {
-    const { nombre, price, img_url, descripcion, enable } = product;
+    const {nombre, img_url, descripcion, enable} = product;
 
     // URL de placeholder por si la imagen falla
     const placeholderImage = '/img/placeholder.jpg';
     return (
         <div className="cat-item d-flex flex-column border mb-4 product-card">
-            <p className="price-tag">{price}$</p>
-
             <div className="product-image-wrapper">
                 <Link to={''} className="product-image-link">
                     <img

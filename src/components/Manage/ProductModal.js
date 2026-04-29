@@ -6,10 +6,10 @@ const ProductModal = ({ onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        price: 1,
         category: '',
         img_url: null,
-        weight: 0.0
+        weight: 0.0,
+        price: 0.0
     });
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -41,11 +41,6 @@ const ProductModal = ({ onClose, onSubmit }) => {
             newErrors.descripcion = 'Description is required';
         }
 
-        if (!formData.price) {
-            newErrors.price = 'Price is required';
-        } else if (isNaN(formData.price) || parseFloat(formData.price) <= 0) {
-            newErrors.price = 'Price must be a positive number';
-        }
 
         if (!formData.category) {
             newErrors.category = 'Category is required';
@@ -57,6 +52,10 @@ const ProductModal = ({ onClose, onSubmit }) => {
 
         if (!formData.weight) {
             newErrors.weight = 'Product weight is required';
+        }
+
+        if (!formData.price) {
+            newErrors.price = 'Product price is required';
         }
 
         return newErrors;
@@ -91,11 +90,10 @@ const ProductModal = ({ onClose, onSubmit }) => {
         const submitData = new FormData();
         submitData.append('nombre', formData.nombre);
         submitData.append('descripcion', formData.descripcion);
-        submitData.append('price', formData.price);
         submitData.append('category', formData.category);
         submitData.append('img_url', formData.img_url);
         submitData.append('weight', formData.weight);
-
+        submitData.append('price', formData.price);
         await onSubmit(submitData);
         setLoading(false);
     };
@@ -137,17 +135,17 @@ const ProductModal = ({ onClose, onSubmit }) => {
                                 <span className="error-message">{errors.nombre}</span>
                             )}
                         </div>
+                    </div>
 
+                    <div className="form-row">
                         <div className="form-group">
-                            <label htmlFor="price">
-                                Price <span className="required">*</span>
+                            <label htmlFor="nombre">
+                                Product Price <span className="required">*</span>
                             </label>
                             <input
                                 style={{color: 'black'}}
-                                type="number"
-                                id="price"
-                                step="0.01"
-                                min="0"
+                                type="text"
+                                id="nombre"
                                 value={formData.price}
                                 onChange={(e) => {
                                     setFormData({...formData, price: e.target.value});

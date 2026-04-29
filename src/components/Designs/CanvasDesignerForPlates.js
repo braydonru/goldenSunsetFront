@@ -91,7 +91,6 @@ export default function DesignerCanvas() {
 
                 const data = await response.json();
                 setProduct(data);
-                setBasePrice(data.price || 0);
                 setWeight(data.weight);
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -109,11 +108,13 @@ export default function DesignerCanvas() {
 
     // ================= CALCULAR PRECIO TOTAL =================
     useEffect(() => {
-        let price = basePrice;
+        if (!selectedVariant) return;
 
-        price *= currentQuantity;
 
-        setTotalPrice(price);
+        let price = selectedVariant.price || 0;
+
+
+        setTotalPrice(price * currentQuantity);
     }, [basePrice, currentQuantity]);
 
 

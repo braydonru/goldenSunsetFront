@@ -107,12 +107,13 @@ export default function DesignerCanvasForCaps() {
 
     // ================= CALCULAR PRECIO TOTAL =================
     useEffect(() => {
-        let price = basePrice;
+        if (!selectedVariant) return;
 
-        price *= currentQuantity;
 
-        setTotalPrice(price);
-    }, [basePrice, currentQuantity]);
+        let price = selectedVariant.price || 0;
+
+        setTotalPrice(price * currentQuantity);
+    }, [selectedVariant, currentQuantity]);
 
 
     // Cargar colores disponibles y seleccionar el primero por defecto
