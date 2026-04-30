@@ -14,6 +14,16 @@ const SIZE_TO_CANVAS = {
     'default': { width: 400, height: 500 }
 };
 
+// Mapeo de tamaños a precios para placas regulares
+const SIZE_TO_PRICE = {
+    '4" x 6"': 5.00,
+    '6" x 8"': 7.50,
+    '8" x 10"': 10.00,
+    '11" x 14"': 12.00,
+    'default': 10.00
+};
+
+const CAR_PLATE_PRICE = 10.00;
 const CAR_PLATE_DIMENSIONS = { width: 500, height: 300 };
 
 const getImageUrl = (path) => {
@@ -91,7 +101,7 @@ export default function DesignerCanvas() {
 
                 const data = await response.json();
                 setProduct(data);
-                setWeight(data.weight);
+                setWeight(data.weight || 0);
             } catch (error) {
                 console.error('Error fetching product:', error);
                 setValidationError('Could not load product details');
@@ -106,24 +116,34 @@ export default function DesignerCanvas() {
         }
     }, [id]);
 
-    // ================= CALCULAR PRECIO TOTAL =================
-    useEffect(() => {
-        if (!selectedVariant) return;
-
-
-        let price = selectedVariant.price || 0;
-
-
-        setTotalPrice(price * currentQuantity);
-    }, [basePrice, currentQuantity]);
-
-
     // Detectar Car Plate
     const isCarPlate = useCallback(() => {
         if (!selectedVariant) return false
         const name = selectedVariant.name?.toLowerCase() || ''
         return name.includes('car plate') || name.includes('carplate') || name === 'car'
     }, [selectedVariant])
+
+    // ================= CALCULAR PRECIO TOTAL =================
+    useEffect(() => {
+        if (!selectedVariant) return;
+
+        let price = 0;
+
+        if (isCarPlate()) {
+            // Precio fijo para Car Plate
+            price = CAR_PLATE_PRICE;
+        } else {
+            // Precio según el tamaño seleccionado
+            if (size && SIZE_TO_PRICE[size]) {
+                price = SIZE_TO_PRICE[size];
+            } else {
+                price = SIZE_TO_PRICE.default;
+            }
+        }
+
+        setBasePrice(price);
+        setTotalPrice(price * currentQuantity);
+    }, [selectedVariant, size, currentQuantity, isCarPlate]);
 
     // Actualizar dimensiones según tipo
     useEffect(() => {
@@ -183,13 +203,10 @@ export default function DesignerCanvas() {
             return
         }
 
-        console.log("🖼️ Cargando imagen para placa normal:", imageUrl)
-
         const img = new Image()
         img.crossOrigin = "anonymous"
 
         img.onload = () => {
-            console.log("✅ Imagen cargada exitosamente")
             baseImageRef.current = img
             setImageLoadError(null)
             setImageLoaded(true)
@@ -457,6 +474,45 @@ export default function DesignerCanvas() {
                     </span>
                 )}
             </h3>
+
+            {/* Mostrar precio base según tamaño */}
+            {selectedVariant && !isCarPlate() && size && (
+                <div style={{
+                    marginBottom: 15,
+                    padding: "15px",
+                    borderRadius: 8,
+                    background: "linear-gradient(135deg, #2a2f3e, #1a1f2e)",
+                    color: "white",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+                }}>
+                    <span style={{fontSize: 14, fontWeight: 500}}>Base Price ({size}):</span>
+                    <span style={{fontSize: 20, fontWeight: 700, color: "#CD7F32"}}>
+                        ${basePrice.toFixed(2)}
+                    </span>
+                </div>
+            )}
+
+            {selectedVariant && isCarPlate() && (
+                <div style={{
+                    marginBottom: 15,
+                    padding: "15px",
+                    borderRadius: 8,
+                    background: "linear-gradient(135deg, #2a2f3e, #1a1f2e)",
+                    color: "white",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+                }}>
+                    <span style={{fontSize: 14, fontWeight: 500}}>Base Price (Car Plate):</span>
+                    <span style={{fontSize: 20, fontWeight: 700, color: "#CD7F32"}}>
+                        ${basePrice.toFixed(2)}
+                    </span>
+                </div>
+            )}
 
             {/* Mensaje de éxito */}
             {showSuccess && (
