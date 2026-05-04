@@ -22,7 +22,7 @@ const ForPullover = () => {
                         <DesignSection/>
                     </div>
                     <div className="col-3">
-                        <VariantSelector category={'T-Shirt'}/>
+                        <VariantSelector category={'Tops'}/>
                     </div>
                 </div>
 
