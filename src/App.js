@@ -24,12 +24,12 @@ import ListCategories from "./components/Manage/ListCategories";
 import ListColors from "./components/Manage/ListColors";
 import ListVariants from "./components/Manage/ListVariants";
 import AllReviews from "./components/Home/AllReviews";
-import Reviews from "./components/Home/Reviews";
 import Designs from "./components/Home/Designs";
 import ListDesigns from "./components/Manage/ListDesign";
 import ListUsers from "./components/Manage/ListUsers";
 import ForCaps from "./components/Designs/ForCaps";
 import OrdersUser from "./components/Home/OrdersUser";
+import GenericDesignTemplate from "./components/Designs/GenericDesignTemplate";
 
 
 const App = () => {
@@ -43,12 +43,19 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/allreviews" element={<AllReviews/>} />
             <Route path="alldesigns" element={<Designs/>}/>
+
             {/* 🔐 PRIVADAS (cualquier usuario logueado) */}
 
             <Route path="/orders_ready"
                    element={
                        <ProtectedRoute>
                            <OrdersUser/>
+                       </ProtectedRoute>
+                   }/>
+            <Route path="/product/:id"
+                   element={
+                       <ProtectedRoute>
+                           <GenericDesignTemplate/>
                        </ProtectedRoute>
                    }/>
             <Route path="/designer/shirt/:id" element={

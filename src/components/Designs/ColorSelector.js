@@ -24,6 +24,7 @@ const ColorPicker = () => {
             setLoading(true);
             const response = await get_colors_by_variant(variantName);
             setColors(Array.isArray(response) ? response : []);
+
         } catch (error) {
             console.error('Error fetching colors:', error);
         } finally {
