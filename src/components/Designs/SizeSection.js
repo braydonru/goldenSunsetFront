@@ -1,116 +1,161 @@
-import {useState, useEffect, useRef, useCallback} from 'react'
+import {useState, useEffect, useCallback} from "react";
 import { useDesignerStore } from "./designer.store";
-import {color} from "three/src/Three.TSL";
-
-const SIZES = [
-    { label: 'XS', stock: 2 },
-    { label: 'S', stock: 3 },
-    { label: 'M', stock: 10 },
-    { label: 'L', stock: 2 },
-    { label: 'XL', stock: 7 },
-    { label: '2XL', stock: 7 },
-    { label: '3XL', stock: 7 },
-    { label: '4XL', stock: 7 },
-    { label: '5XL', stock: 7 },
-]
+import {get_size_by_variant} from "../../hooks/get_variants";
 
 export default function SizeSelector({ onChange }) {
-    const { setSize, setSpecification,specification } = useDesignerStore()
 
-    const [selected, setSelected] = useState(null)
+    const {
+        selectedVariant,
+        setSize,
+        setSpecification,
+        specification
+    } = useDesignerStore();
 
-    const precio = ()=>{
-        if (selected==="3XL")
-            return "+5$"
-        if (selected==="4XL" || selected==="5XL"){
-            return "+7$"
-        }
-    }
+    const [sizes, setSizes] = useState([]);
+    const [selected, setSelected] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const precio = () => {
+        if (selected === "3XL") return "+5$";
+        if (selected === "4XL" || selected === "5XL") return "+7$";
+        return "";
+    };
 
     const updateSpecification = useCallback((value) => {
-        setSpecification(value)
-    }, [])
+        setSpecification(value);
+    }, [setSpecification]);
 
-    // SOLO actualizar el store cuando cambia selected
+    // Cargar tallas cuando cambie la variante
     useEffect(() => {
-        if (selected) {
-            setSize(selected)
-            if (onChange) {
-                onChange(selected)
+
+        if (!selectedVariant?.id) {
+            setSizes([]);
+            setSelected(null);
+            return;
+        }
+
+        const fetchSizes = async () => {
+
+            setLoading(true);
+
+            try {
+
+                const response = await get_size_by_variant(selectedVariant.id);
+
+                setSizes(response);
+
+                if (response.length > 0) {
+                    setSelected(response[0].size);
+                } else {
+                    setSelected(null);
+                }
+
+            } catch (error) {
+
+                console.error(error);
+                setSizes([]);
+                setSelected(null);
+
+            } finally {
+
+                setLoading(false);
+
             }
-        }
-    }, [selected, setSize, onChange])
 
-    // Inicializar con una talla por defecto UNA VEZ
+        };
+
+        fetchSizes();
+
+    }, [selectedVariant]);
+
+    // Actualizar el store
     useEffect(() => {
-        // Establecer talla por defecto si no hay selección
-        if (!selected) {
-            const defaultSize = 'M' // Puedes cambiar esto
-            setSelected(defaultSize)
-        }
-    }, [selected])
 
-    const selectSize = (size) => {
-        setSelected(size)
-    }
+        if (selected) {
+
+            setSize(selected);
+
+            if (onChange) {
+                onChange(selected);
+            }
+
+        }
+
+    }, [selected, setSize, onChange]);
 
     return (
         <>
-        <div className="size-box">
-            <h5 className="title">Choose Size</h5>
+            <div className="size-box">
 
-            <div className="sizes">
-                {SIZES.map((s) => (
-                    <label
-                        key={s.label}
-                        className={`size 
-                            ${selected === s.label ? 'active' : ''}
-                            ${s.stock === 0 ? 'disabled' : ''}`}
-                    >
-                        <input
-                            type="radio"
-                            name="size"
-                            value={s.label}
-                            checked={selected === s.label}
-                            disabled={s.stock === 0}
-                            onChange={() => selectSize(s.label)}
-                        />
-                        {s.label}
-                    </label>
+                <h5 className="title">Choose Size</h5>
 
-                ))}
+                {loading && <p>Loading sizes...</p>}
+
+                {!loading && (
+
+                    <div className="sizes">
+
+                        {sizes.map((item) => (
+
+                            <label
+                                key={item.id}
+                                className={`size ${
+                                    selected === item.size ? "active" : ""
+                                }`}
+                            >
+
+                                <input
+                                    type="radio"
+                                    name="size"
+                                    value={item.size}
+                                    checked={selected === item.size}
+                                    onChange={() => setSelected(item.size)}
+                                />
+
+                                {item.size}
+
+                            </label>
+
+                        ))}
+
+                    </div>
+
+                )}
+
+                {selected && (
+
+                    <p className="selected">
+
+                        Selected size: <strong>{selected}</strong>
+
+                    </p>
+
+                )}
+
+                <strong style={{color: "red"}}>
+                    {precio()}
+                </strong>
+
             </div>
 
-            {selected && (
-                <p className="selected">
-                    Selected size: <strong>{selected}</strong>
-
-                </p>
-
-            )
-            }
-            <strong style={{color: 'red'}}>{precio()}</strong>
-        </div>
             <input
                 type="text"
                 placeholder="✏️ Specifications Here (Optional)"
                 value={specification}
                 onChange={(e) => updateSpecification(e.target.value)}
                 style={inputStyle}
-
             />
         </>
-    )
-
+    );
 }
 
 const inputStyle = {
-    padding: '12px 16px',
-    borderRadius: '6px',
-    border: '1px solid #ced4da',
-    fontSize: '16px',
-    width: '100%',
-    boxSizing: 'border-box',
-    backgroundColor: '#fff',
-    transition: 'border-color 0.3s'
-}
+    padding: "12px 16px",
+    borderRadius: "6px",
+    border: "1px solid #ced4da",
+    fontSize: "16px",
+    width: "100%",
+    boxSizing: "border-box",
+    backgroundColor: "#fff",
+    transition: "border-color 0.3s"
+};

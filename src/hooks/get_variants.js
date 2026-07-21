@@ -98,7 +98,6 @@ export const createVariant = async (formData) => {
             },
             body: formData
         });
-
         if (!response.ok) {
             const errorData = await response.json().catch(() => null);
 
@@ -160,3 +159,21 @@ export const get_variants_by_category = async (category) => {
     }
 };
 
+export const get_size_by_variant = async (variant_id) => {
+    try {
+        const response = await fetch(`${ENV.API_URL}/product_variant/get_size_by_variant/${variant_id}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Error fetching variants by variant_id');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error in get_variants_by_category:', error);
+        return [];
+    }
+};

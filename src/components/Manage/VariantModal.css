@@ -225,3 +225,35 @@
         width: 100%;
     }
 }
+
+/* ---------- Sizes ---------- */
+
+.sizes-grid {
+    display: grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.size-btn {
+    height: 48px;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    background: #fff;
+    color: #444;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: .2s;
+}
+
+.size-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.size-btn.active {
+    background: #111827;
+    border-color: #111827;
+    color: white;
+}

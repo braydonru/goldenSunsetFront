@@ -15,6 +15,19 @@ const VariantModal = ({ onClose, onSubmit }) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
+    const availableSizes = [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL",
+        "3XL",
+        "4XL",
+        "5XL",
+    ];
+
+    const [selectedSizes, setSelectedSizes] = useState([]);
 
     // Cargar categorías para el selector
     useEffect(() => {
@@ -48,7 +61,9 @@ const VariantModal = ({ onClose, onSubmit }) => {
         if (!formData.price) {
             newErrors.price = 'Variant price is required';
         }
-
+        if (selectedSizes.length === 0) {
+            newErrors.sizes = "Select at least one size";
+        }
         return newErrors;
     };
 
@@ -80,6 +95,19 @@ const VariantModal = ({ onClose, onSubmit }) => {
         }
     };
 
+    const toggleSize = (size) => {
+        if (selectedSizes.includes(size)) {
+            setSelectedSizes(selectedSizes.filter(s => s !== size));
+        } else {
+            setSelectedSizes([...selectedSizes, size]);
+        }
+
+        setErrors(prev => ({
+            ...prev,
+            sizes: null
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -97,6 +125,10 @@ const VariantModal = ({ onClose, onSubmit }) => {
             submitData.append('category_id', formData.category_id);
             submitData.append('image_url', formData.image_url);
             submitData.append('price', formData.price);
+            selectedSizes.forEach(size => {
+                submitData.append("sizes", size);
+            });
+
 
             await onSubmit(submitData);
 
@@ -216,8 +248,34 @@ const VariantModal = ({ onClose, onSubmit }) => {
                                 <span className="preview-label">Preview</span>
                             </div>
                         )}
-                    </div>
 
+                    </div>
+                    <div className="form-group">
+                        <label>
+                            Available Sizes <span className="required">*</span>
+                        </label>
+
+                        <div className="sizes-grid">
+                            {availableSizes.map(size => (
+                                <button
+                                    key={size}
+                                    type="button"
+                                    className={`size-btn ${
+                                        selectedSizes.includes(size) ? "active" : ""
+                                    }`}
+                                    onClick={() => toggleSize(size)}
+                                >
+                                    {size}
+                                </button>
+                            ))}
+                        </div>
+
+                        {errors.sizes && (
+                            <span className="error-message">
+            {errors.sizes}
+        </span>
+                        )}
+                    </div>
                     <div className="modal-actions">
                         <button
                             type="button"
